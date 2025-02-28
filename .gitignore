@@ -54,3 +54,9 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+gcp-key.json
+google-cloud-sdk/
+google-cloud-cli-*.tar.gz
+gcp-key.json
+google-cloud-sdk/
+google-cloud-cli-*.tar.gz
