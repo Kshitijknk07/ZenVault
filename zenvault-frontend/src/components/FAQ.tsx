@@ -37,14 +37,14 @@ const FAQ = () => {
   };
 
   return (
-    <div id="faq" className="py-16 bg-gray-900">
+    <div id="faq" className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
-          <h2 className="text-base text-indigo-400 font-semibold tracking-wide uppercase">FAQ</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">FAQ</h2>
+          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             Frequently asked questions
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-400 lg:mx-auto">
+          <p className="mt-4 max-w-2xl text-xl text-gray-600 lg:mx-auto">
             Find answers to common questions about ZenVault.
           </p>
         </div>
@@ -52,28 +52,28 @@ const FAQ = () => {
         <div className="mt-12 max-w-3xl mx-auto">
           <dl>
             {faqs.map((faq, index) => (
-              <div 
-                key={index} 
-                className={`mt-6 border-b border-gray-700 pb-6 ${index === 0 ? 'border-t pt-6' : ''}`}
+              <div
+                key={index}
+                className={`mt-6 border-b border-gray-200 pb-6 ${index === 0 ? 'border-t pt-6' : ''}`}
               >
                 <dt className="text-lg">
                   <button
                     onClick={() => toggleFAQ(index)}
-                    className="flex w-full items-start justify-between text-left text-white focus:outline-none"
+                    className="flex w-full items-start justify-between text-left text-gray-900 focus:outline-none"
                   >
                     <span className="font-medium">{faq.question}</span>
                     <span className="ml-6 flex-shrink-0">
                       {openIndex === index ? (
-                        <ChevronUp className="h-6 w-6 text-indigo-400" />
+                        <ChevronUp className="h-6 w-6 text-indigo-600" />
                       ) : (
-                        <ChevronDown className="h-6 w-6 text-indigo-400" />
+                        <ChevronDown className="h-6 w-6 text-indigo-600" />
                       )}
                     </span>
                   </button>
                 </dt>
                 {openIndex === index && (
                   <dd className="mt-4 pr-12">
-                    <p className="text-base text-gray-400">{faq.answer}</p>
+                    <p className="text-base text-gray-600">{faq.answer}</p>
                   </dd>
                 )}
               </div>

@@ -29,40 +29,40 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <div id="testimonials" className="py-16 bg-gray-800">
+    <div id="testimonials" className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
-          <h2 className="text-base text-indigo-400 font-semibold tracking-wide uppercase">Testimonials</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Testimonials</h2>
+          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             Trusted by professionals worldwide
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-400 lg:mx-auto">
+          <p className="mt-4 max-w-2xl text-xl text-gray-600 lg:mx-auto">
             Don't just take our word for it. See what our users have to say about ZenVault.
           </p>
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-700">
+            <div key={index} className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`h-5 w-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-600'}`} 
-                    fill={i < testimonial.rating ? 'currentColor' : 'none'} 
+                  <Star
+                    key={i}
+                    className={`h-5 w-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                    fill={i < testimonial.rating ? 'currentColor' : 'none'}
                   />
                 ))}
               </div>
-              <p className="text-gray-300 mb-6 italic">"{testimonial.content}"</p>
+              <p className="text-gray-600 mb-6 italic">"{testimonial.content}"</p>
               <div className="flex items-center">
-                <img 
-                  className="h-12 w-12 rounded-full object-cover" 
-                  src={testimonial.avatar} 
-                  alt={testimonial.author} 
+                <img
+                  className="h-12 w-12 rounded-full object-cover"
+                  src={testimonial.avatar}
+                  alt={testimonial.author}
                 />
                 <div className="ml-4">
-                  <h4 className="text-white font-medium">{testimonial.author}</h4>
-                  <p className="text-gray-400 text-sm">{testimonial.role}, {testimonial.company}</p>
+                  <h4 className="text-gray-900 font-medium">{testimonial.author}</h4>
+                  <p className="text-gray-600 text-sm">{testimonial.role}, {testimonial.company}</p>
                 </div>
               </div>
             </div>

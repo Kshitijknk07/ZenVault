@@ -10,7 +10,7 @@ import Login from './Login/Login';
 import Profile from './Login/Profile';
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-gray-900 text-white">
+  <div className="min-h-screen bg-white text-black">
     <Navbar />
     {children}
     <Footer />
