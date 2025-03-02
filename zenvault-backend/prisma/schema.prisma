@@ -14,3 +14,11 @@ model User {
   createdAt DateTime @default(now())
   role      String   @default("USER")
 }
+
+model ClerkUser {
+  id       String  @id @default(uuid()) 
+  clerkId  String  @unique 
+  email    String  @unique
+  name     String?
+  createdAt DateTime @default(now())
+}
