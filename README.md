@@ -31,10 +31,8 @@ zenvault-backend/
 │   ├── controllers/     # API endpoints
 │   ├── services/        # Business logic
 │   ├── utils/           # Utility functions
-│   └── types/           # TypeScript type definitions
 ├── prisma/
 │   └── schema.prisma   # Database schema
-└── tests/              # Test files
 ```
 
 ## Getting Started
