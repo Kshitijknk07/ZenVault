@@ -3,7 +3,6 @@ import { Storage } from '@google-cloud/storage';
 const storage = new Storage();
 const bucketName = 'zenvault-bucket';
 
-
 export const uploadFile = async (filePath: string, destFileName: string) => {
   try {
     await storage.bucket(bucketName).upload(filePath, {
@@ -15,7 +14,10 @@ export const uploadFile = async (filePath: string, destFileName: string) => {
   }
 };
 
-export const downloadFile = async (srcFileName: string, destFileName: string) => {
+export const downloadFile = async (
+  srcFileName: string,
+  destFileName: string
+) => {
   try {
     await storage.bucket(bucketName).file(srcFileName).download({
       destination: destFileName,
@@ -25,7 +27,6 @@ export const downloadFile = async (srcFileName: string, destFileName: string) =>
     console.error('Error downloading file:', error);
   }
 };
-
 
 export const deleteFile = async (fileName: string) => {
   try {
