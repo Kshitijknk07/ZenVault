@@ -16,6 +16,7 @@
   "license": "ISC",
   "description": "ZenVault backend with Clerk Auth and Google Cloud Storage integration.",
   "dependencies": {
+    "@clerk/clerk-react": "^5.24.1",
     "@clerk/clerk-sdk-node": "^5.1.6",
     "@clerk/express": "^1.3.50",
     "@google-cloud/storage": "^7.15.2",

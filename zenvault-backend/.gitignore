@@ -21,4 +21,10 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
-zenvault-backend/gen-lang-client-0995147460-7bc8a038e4b4.json
+
+# Prisma generated files
+prisma/generated/
+prisma/migrations/
+
+
+gen-lang-client-0995147460-7bc8a038e4b4.json

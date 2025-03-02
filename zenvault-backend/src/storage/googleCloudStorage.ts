@@ -11,13 +11,11 @@ export const uploadFile = async (filePath: string, destFileName: string) => {
     console.log(`${filePath} uploaded to ${bucketName}`);
   } catch (error) {
     console.error('Error uploading file:', error);
+    throw error;
   }
 };
 
-export const downloadFile = async (
-  srcFileName: string,
-  destFileName: string
-) => {
+export const downloadFile = async (srcFileName: string, destFileName: string) => {
   try {
     await storage.bucket(bucketName).file(srcFileName).download({
       destination: destFileName,
@@ -25,6 +23,7 @@ export const downloadFile = async (
     console.log(`${srcFileName} downloaded to ${destFileName}`);
   } catch (error) {
     console.error('Error downloading file:', error);
+    throw error;
   }
 };
 
@@ -34,5 +33,6 @@ export const deleteFile = async (fileName: string) => {
     console.log(`File ${fileName} deleted from ${bucketName}`);
   } catch (error) {
     console.error('Error deleting file:', error);
+    throw error;
   }
 };
