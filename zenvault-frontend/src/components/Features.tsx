@@ -42,28 +42,32 @@ const features = [
 
 const Features = () => {
   return (
-    <div id="features" className="py-16 bg-white">
+    <div id="features" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:text-center">
-          <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Features</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Everything you need in one place
+        <div className="lg:text-center animate-fade-in">
+          <h2 className="text-sm text-indigo-600 font-bold tracking-widest uppercase">Powerful Features</h2>
+          <p className="mt-4 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl leading-tight">
+            Everything you need,<br className="hidden sm:block" /> all in one secure place
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-600 lg:mx-auto">
-            ZenVault combines security, convenience, and powerful features to give you the best cloud storage experience.
+          <p className="mt-6 max-w-2xl text-xl text-gray-600 lg:mx-auto leading-relaxed">
+            Experience the perfect blend of security, convenience, and powerful features. ZenVault delivers enterprise-grade protection with consumer-friendly simplicity.
           </p>
         </div>
 
-        <div className="mt-16">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <div key={feature.name} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-indigo-500 transition-all duration-300">
+        <div className="mt-20">
+          <div className="grid grid-cols-1 gap-y-8 gap-x-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-12">
+            {features.map((feature, index) => (
+              <div
+                key={feature.name}
+                className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-indigo-100 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
                 <div>
-                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
-                    <feature.icon className="h-6 w-6" />
+                  <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-indigo-50 text-indigo-600 mb-6 transform transition-transform duration-300 group-hover:scale-110">
+                    <feature.icon className="h-7 w-7" />
                   </div>
-                  <h3 className="mt-5 text-lg leading-6 font-medium text-gray-900">{feature.name}</h3>
-                  <p className="mt-2 text-base text-gray-600">{feature.description}</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.name}</h3>
+                  <p className="text-base text-gray-600 leading-relaxed">{feature.description}</p>
                 </div>
               </div>
             ))}
