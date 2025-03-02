@@ -16,9 +16,10 @@ model User {
 }
 
 model ClerkUser {
-  id       String  @id @default(uuid()) 
-  clerkId  String  @unique 
-  email    String  @unique
-  name     String?
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  role      String   @default("USER")
   createdAt DateTime @default(now())
 }

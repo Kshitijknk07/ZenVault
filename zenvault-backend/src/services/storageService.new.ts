@@ -5,40 +5,39 @@ import { SecurityService } from './securityService';
 import * as fs from 'fs';
 import * as path from 'path';
 
+
 const fileValidationService = new FileValidationService();
 const securityService = new SecurityService();
 const storageService = new GoogleCloudStorageService();
-
-export interface FileDownloadResult {
-    success: boolean;
-    message: string;
-    filePath: string;
-    metadata?: {
-        mimeType: string;
-        hash: string;
-        size: number;
-    };
-}
 
 export interface FileUploadResult {
     success: boolean;
     message: string;
     fileUrl?: string;
-    metadata?: Metadata;
-}
-
-export interface Metadata {
-    hash: string;
-    size: number;
-    mimeType: string;
-    encryptedSize: number;
-    encryptionKey?: string;
+    metadata?: {
+        encryptionKey?: string;
+        hash: string;
+        size: number;
+        mimeType: string;
+        encryptedSize: number;
+    };
 }
 
 export interface FileUploadOptions extends FileValidationOptions {
     encrypt?: boolean;
     generateSignedUrl?: boolean;
     urlExpirationTime?: number;
+}
+
+export interface FileDownloadResult {
+    success: boolean;
+    message: string;
+    filePath: string;
+    metadata?: {
+        size: number;
+        mimeType: string;
+        hash: string;
+    };
 }
 
 const DEFAULT_UPLOAD_OPTIONS: FileUploadOptions = {
@@ -50,7 +49,7 @@ const DEFAULT_UPLOAD_OPTIONS: FileUploadOptions = {
 };
 
 export async function uploadFileService(
-    filePath: string,
+    filePath: string, 
     destFileName: string,
     options: FileUploadOptions = DEFAULT_UPLOAD_OPTIONS
 ): Promise<FileUploadResult> {
@@ -60,7 +59,7 @@ export async function uploadFileService(
 
     try {
         const validationResult = await fileValidationService.validateFile(filePath);
-
+        
         if (!validationResult.isValid) {
             throw new Error(`File validation failed: ${validationResult.errors.join(', ')}`);
         }
@@ -72,7 +71,7 @@ export async function uploadFileService(
         if (options.encrypt) {
             encryptionKey = securityService.generateEncryptionKey();
             const encryptionResult = await securityService.encryptBuffer(fileBuffer, encryptionKey);
-
+            
             finalBuffer = Buffer.concat([
                 encryptionResult.salt,
                 encryptionResult.iv,
@@ -91,16 +90,16 @@ export async function uploadFileService(
         await storageService.uploadFile(tempPath, uniqueFileName);
 
         fs.unlinkSync(tempPath);
-
+        
         let fileUrl: string | undefined;
         if (options.generateSignedUrl) {
             fileUrl = await storageService.generateSignedUrl(
-                uniqueFileName,
+                uniqueFileName, 
                 options.urlExpirationTime
             );
         }
 
-        const metadata: Metadata = {
+        const metadata = {
             hash: validationResult.fileInfo.hash,
             size: validationResult.fileInfo.size,
             mimeType: validationResult.fileInfo.mimeType,
@@ -108,7 +107,7 @@ export async function uploadFileService(
             encryptionKey: encryptionKey
         };
 
-        const sanitizedMetadata = securityService.sanitizeMetadata<Metadata>(metadata);
+        const sanitizedMetadata = securityService.sanitizeMetadata(metadata);
 
         return {
             success: true,
@@ -191,12 +190,8 @@ export async function deleteFileService(fileName: string): Promise<void> {
     }
 
     try {
-        const metadata = await storageService.getFileMetadata(fileName);
-
-        if (!metadata) {
-            throw new Error('File not found or not accessible');
-        }
-
+        await storageService.getFileMetadata(fileName);
+        
         await storageService.deleteFile(fileName);
         logger.info(`File successfully deleted: ${fileName}`);
     } catch (error) {
@@ -212,11 +207,6 @@ export async function getFileMetadata(fileName: string): Promise<any> {
 
     try {
         const metadata = await storageService.getFileMetadata(fileName);
-
-        if (!metadata) {
-            throw new Error('File metadata not found');
-        }
-
         return securityService.sanitizeMetadata(metadata);
     } catch (error) {
         logger.error(`Error getting file metadata: ${(error as Error).message}`);
@@ -232,24 +222,8 @@ export async function generateFileUrl(
         throw new Error('File name is required');
     }
 
-    if (expirationTime <= 0 || expirationTime > 604800) { 
-        throw new Error('Invalid expiration time. Must be between 1 second and 7 days');
-    }
-
     try {
-        const metadata = await storageService.getFileMetadata(fileName);
-
-        if (!metadata) {
-            throw new Error('File not found or not accessible');
-        }
-
-        const url = await storageService.generateSignedUrl(fileName, expirationTime);
-
-        if (!url) {
-            throw new Error('Failed to generate signed URL');
-        }
-
-        return url;
+        return await storageService.generateSignedUrl(fileName, expirationTime);
     } catch (error) {
         logger.error(`Error generating file URL: ${(error as Error).message}`);
         throw new Error(`Failed to generate file URL: ${(error as Error).message}`);
