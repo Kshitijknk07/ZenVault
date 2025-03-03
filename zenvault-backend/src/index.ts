@@ -11,27 +11,19 @@ import { logger } from './utils/logger';
 const app = express();
 const PORT = process.env.PORT || 5002;
 
-
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
-
-
 app.use(ClerkExpressWithAuth());
-
-
 app.use(attachUser);
-
 
 app.use('/files', fileRoutes);
 app.use('/users', userRoutes);
 
-
 app.get('/', (req, res) => {
   res.send('ZenVault Backend is Running! 🚀');
 });
-
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error(err.stack);

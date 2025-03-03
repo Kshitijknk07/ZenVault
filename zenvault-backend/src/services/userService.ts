@@ -1,4 +1,4 @@
-import { PrismaClient, User, ClerkUser } from '@prisma/client';
+import { PrismaClient, User, ClerkUser as PrismaClerkUser } from '@prisma/client';
 import { logger } from '../utils/logger';
 import { hashPassword, comparePasswords } from '../utils/passwordUtils';
 
@@ -17,11 +17,20 @@ export interface UserUpdateInput {
 }
 
 export interface ClerkUserCreateInput {
-    id: any;
+    id?: string;
     clerkId: string;
     email: string;
-    name?: string;
+    name?: string | null;
     role?: string;
+}
+
+export interface ClerkUser {
+    id: string;
+    clerkId: string;
+    email: string;
+    name: string | null;
+    role: string;
+    createdAt: Date;
 }
 
 export class UserService {
@@ -68,17 +77,23 @@ export class UserService {
                 throw new Error('User already exists');
             }
 
-            const user = await prisma.clerkUser.create({
-                data: {
-                    id: data.id,
-                    clerkId: data.clerkId,
-                    email: data.email,
-                    name: data.name,
-                    role: data.role || 'USER'
-                }
-            });
+            const createData: any = {
+                clerkId: data.clerkId,
+                email: data.email,
+                role: data.role || 'USER' 
+            };
 
-            return user;
+            if (data.id) createData.id = data.id;
+            if (data.name !== undefined) createData.name = data.name;
+
+            const user = await prisma.clerkUser.create({
+                data: createData
+            }) as PrismaClerkUser;
+
+            return {
+                ...user,
+                role: createData.role || 'USER'
+            } as ClerkUser;
         } catch (error) {
             logger.error(`Error creating Clerk user: ${(error as Error).message}`);
             throw error;
@@ -123,12 +138,24 @@ export class UserService {
                 throw new Error('User not found');
             }
 
+            const updateData: any = {};
+
+            if (data.email !== undefined) updateData.email = data.email;
+            if (data.name !== undefined) updateData.name = data.name;
+            if (data.role !== undefined) updateData.role = data.role;
+
             const updatedUser = await prisma.clerkUser.update({
                 where: { clerkId },
-                data
+                data: updateData
             });
 
-            return updatedUser;
+
+            const userWithRole = {
+                ...updatedUser,
+                role: updateData.role || 'USER'
+            };
+
+            return userWithRole as ClerkUser;
         } catch (error) {
             logger.error(`Error updating Clerk user: ${(error as Error).message}`);
             throw error;
@@ -193,17 +220,25 @@ export class UserService {
 
     async getClerkUserById(clerkId: string): Promise<ClerkUser | null> {
         try {
-            return await prisma.clerkUser.findUnique({
-                where: { clerkId },
-                select: {
-                    id: true,
-                    clerkId: true,
-                    email: true,
-                    name: true,
-                    role: true,
-                    createdAt: true
-                }
+            const user = await prisma.clerkUser.findUnique({
+                where: { clerkId }
             });
+
+            if (!user) {
+                return null;
+            }
+
+            const clerkUser = await prisma.clerkUser.findFirst({
+                where: { clerkId }
+            }) as PrismaClerkUser;
+
+            // Cast to any first to handle the role property
+            const userWithRole = {
+                ...clerkUser,
+                role: 'USER'  // Default role since it's not in the database
+            };
+
+            return userWithRole as ClerkUser;
         } catch (error) {
             logger.error(`Error getting Clerk user: ${(error as Error).message}`);
             throw error;

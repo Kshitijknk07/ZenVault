@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { uploadFileController, downloadFileController, deleteFileController } from '../controllers/fileController';
+import {
+  uploadFileController,
+  downloadFileController,
+  deleteFileController
+} from '../controllers/fileController';
 import { requireAuth } from '@clerk/express';
 
 const router = Router();

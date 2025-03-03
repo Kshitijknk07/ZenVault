@@ -27,7 +27,7 @@ export class GoogleCloudStorageService {
             const bucket = await this.getBucket();
             await bucket.upload(filePath, {
                 destination: destFileName,
-                // Set metadata to help with file management
+
                 metadata: {
                     cacheControl: 'no-cache',
                     metadata: {
