@@ -3,7 +3,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import Pricing from './components/Pricing';
-import Testimonials from './components/Testimonials';
+import Creator from './components/Creator';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import Login from './Login/Login';
@@ -22,18 +22,15 @@ const App = () => {
     <Router>
       <Layout>
         <Routes>
-         
           <Route path="/" element={
             <>
               <Hero />
               <Features />
               <Pricing />
-              <Testimonials />
+              <Creator />
               <FAQ />
             </>
           } />
-          
-          
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>

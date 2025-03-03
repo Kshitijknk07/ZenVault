@@ -31,4 +31,3 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 );
 
 export default Main;
-
