@@ -13,7 +13,7 @@ const plans = [
       '2 Factor Authentication',
     ],
     cta: 'Sign up for free',
-    highlighted: false,
+    color: 'indigo',
   },
   {
     name: 'Pro',
@@ -29,7 +29,7 @@ const plans = [
       'Advanced security features',
     ],
     cta: 'Start your trial',
-    highlighted: true,
+    color: 'indigo',
   },
   {
     name: 'Enterprise',
@@ -46,7 +46,7 @@ const plans = [
       'Enterprise-grade security',
     ],
     cta: 'Contact sales',
-    highlighted: false,
+    color: 'indigo',
   },
 ];
 
@@ -68,10 +68,7 @@ const Pricing = () => {
           {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`rounded-2xl overflow-hidden transition-all duration-300 animate-fade-in
-                ${plan.highlighted
-                  ? 'border-2 border-indigo-500 transform scale-105 z-10 bg-white shadow-lg hover:shadow-2xl'
-                  : 'border border-gray-200 bg-white shadow-sm hover:shadow-xl hover:-translate-y-1'}`}
+              className="rounded-2xl overflow-hidden transition-all duration-300 animate-fade-in border-2 border-indigo-500 bg-white shadow-lg hover:shadow-2xl hover:-translate-y-1"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="px-8 py-10">
@@ -82,7 +79,7 @@ const Pricing = () => {
                 </div>
                 <p className="mt-4 text-lg text-gray-600 leading-relaxed">{plan.description}</p>
               </div>
-              <div className="px-8 pt-6 pb-10 bg-gray-50">
+              <div className="px-8 pt-6 pb-10 bg-indigo-50">
                 <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">What's included</h4>
                 <ul className="space-y-4">
                   {plan.features.map((feature) => (
@@ -94,10 +91,8 @@ const Pricing = () => {
                 </ul>
                 <div className="mt-10">
                   <button
-                    className={`w-full px-6 py-4 border rounded-xl text-base font-semibold transition-all duration-200 hover-lift
-                      ${plan.highlighted
-                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white border-transparent shadow-md hover:shadow-lg'
-                        : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200 hover:border-gray-300'}`}
+                    className="w-full px-6 py-4 border rounded-xl text-base font-semibold transition-all duration-200 hover-lift
+                      bg-indigo-600 hover:bg-indigo-700 text-white border-transparent shadow-md hover:shadow-lg"
                   >
                     {plan.cta}
                   </button>

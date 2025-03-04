@@ -7,7 +7,11 @@ import Creator from './components/Creator';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import Login from './Login/Login';
+import SignUp from './Login/SignUp';
 import Profile from './Login/Profile';
+import { useAuth, useUser } from '@clerk/clerk-react';
+import { useEffect } from 'react';
+import { userApi } from './lib/api';
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
   <div className="min-h-screen bg-white text-black">
@@ -18,6 +22,28 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
 );
 
 const App = () => {
+  const { isSignedIn, userId } = useAuth();
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (isSignedIn && userId && user) {
+      const syncUserWithBackend = async () => {
+        try {
+          const primaryEmail = user.primaryEmailAddress?.emailAddress;
+
+          const name = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim();
+
+          await userApi.createClerkUser(userId, primaryEmail, name);
+          console.log('User synced with backend successfully');
+        } catch (error) {
+          console.error('Error syncing user with backend:', error);
+        }
+      };
+
+      syncUserWithBackend();
+    }
+  }, [isSignedIn, userId, user]);
+
   return (
     <Router>
       <Layout>
@@ -32,6 +58,7 @@ const App = () => {
             </>
           } />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </Layout>

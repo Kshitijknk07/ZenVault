@@ -14,21 +14,13 @@ const Hero = () => {
               <p className="mt-6 text-lg text-gray-600 sm:mt-8 sm:text-xl sm:max-w-xl sm:mx-auto md:mt-8 md:text-2xl lg:mx-0 leading-relaxed animate-fade-in" style={{ animationDelay: '0.4s' }}>
                 Experience peace of mind with ZenVault's enterprise-grade security. Store, share, and collaborate on your files with unparalleled protection and intuitive simplicity.
               </p>
-              <div className="mt-8 sm:mt-10 sm:flex sm:justify-center lg:justify-start animate-slide-up" style={{ animationDelay: '0.6s' }}>
+              <div className="mt-8 sm:mt-10 flex justify-center lg:justify-start animate-slide-up" style={{ animationDelay: '0.6s' }}>
                 <div className="rounded-md shadow hover-lift">
                   <a
                     href="#"
-                    className="w-full flex items-center justify-center px-8 py-4 border border-transparent text-lg font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 md:py-5 md:text-xl md:px-12"
+                    className="w-full flex items-center justify-center px-10 py-4 border border-transparent text-lg font-semibold rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 md:py-5 md:text-xl md:px-16"
                   >
                     Get started free
-                  </a>
-                </div>
-                <div className="mt-3 sm:mt-0 sm:ml-4 hover-lift">
-                  <a
-                    href="#"
-                    className="w-full flex items-center justify-center px-8 py-4 border border-gray-300 text-lg font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 md:py-5 md:text-xl md:px-12"
-                  >
-                    See how it works
                   </a>
                 </div>
               </div>

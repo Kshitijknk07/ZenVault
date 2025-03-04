@@ -1,8 +1,19 @@
-import { Menu, X, HardDrive } from 'lucide-react';
+import { Menu, X, HardDrive, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth, useUser } from '@clerk/clerk-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
     <nav className="bg-white border-b border-gray-200">
@@ -10,14 +21,14 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="flex items-center">
+              <Link to="/" className="flex items-center">
                 <HardDrive className="h-8 w-8 text-indigo-600" />
                 <span className="ml-2 text-xl font-bold text-gray-900">ZenVault</span>
-              </div>
+              </Link>
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <a href="#" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                <Link to="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Home</Link>
                 <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Features</a>
                 <a href="#pricing" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Pricing</a>
                 <a href="#creator" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Creator</a>
@@ -27,12 +38,39 @@ const Navbar = () => {
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">
-              <button className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md text-sm font-medium mr-2">
-                Login
-              </button>
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                Sign Up
-              </button>
+              {isSignedIn ? (
+                <>
+                  <Link
+                    to="/profile"
+                    className="flex items-center text-gray-700 px-4 py-2 rounded-md text-sm font-medium mr-2"
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    {user?.firstName || 'Profile'}
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md text-sm font-medium mr-2"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
           <div className="-mr-2 flex md:hidden">
@@ -50,23 +88,54 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-white">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="#" className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Home</a>
+            <Link to="/" className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Home</Link>
             <a href="#features" className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Features</a>
             <a href="#pricing" className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Pricing</a>
             <a href="#creator" className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Creator</a>
             <a href="#faq" className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">FAQ</a>
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="flex items-center px-5">
-              <button className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md text-sm font-medium mr-2 w-full">
-                Login
-              </button>
-            </div>
-            <div className="mt-3 px-5">
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium w-full">
-                Sign Up
-              </button>
-            </div>
+            {isSignedIn ? (
+              <>
+                <div className="flex items-center px-5">
+                  <Link
+                    to="/profile"
+                    className="flex items-center justify-center text-gray-700 px-4 py-2 rounded-md text-sm font-medium w-full"
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    Profile
+                  </Link>
+                </div>
+                <div className="mt-3 px-5">
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium w-full"
+                  >
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center px-5">
+                  <Link
+                    to="/login"
+                    className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md text-sm font-medium w-full text-center"
+                  >
+                    Login
+                  </Link>
+                </div>
+                <div className="mt-3 px-5">
+                  <Link
+                    to="/signup"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium w-full block text-center"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

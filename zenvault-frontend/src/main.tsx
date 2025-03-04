@@ -1,33 +1,22 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
+import { ClerkProvider } from '@clerk/clerk-react';
 import ErrorBoundary from './Login/ErrorBoundary';
 import './index.css';
 
-const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_YourClerkPublishableKey';
 
-if (!publishableKey) {
-  throw new Error("Missing Clerk publishable key. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.");
+if (!publishableKey || publishableKey === 'pk_test_YourClerkPublishableKey') {
+  console.warn("Missing or default Clerk publishable key. Authentication features may not work correctly.");
 }
-
-const Main = () => (
-  <ClerkProvider publishableKey={publishableKey}>
-    <SignedIn>
-      <App />
-    </SignedIn>
-    <SignedOut>
-      <RedirectToSignIn />
-    </SignedOut>
-  </ClerkProvider>
-);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <Main />
+      <ClerkProvider publishableKey={publishableKey}>
+        <App />
+      </ClerkProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );
-
-export default Main;

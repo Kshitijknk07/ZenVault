@@ -28,18 +28,36 @@ export async function createClerkUser(req: Request, res: Response) {
   try {
     const { clerkId, email, name } = req.body;
 
-    if (!clerkId || !email) {
+    if (!clerkId) {
       return res.status(400).json({
-        error: 'Clerk ID and email are required'
+        error: 'Clerk ID is required'
+      });
+    }
+
+    const existingUser = await userService.getClerkUserById(clerkId);
+
+    if (existingUser) {
+      return res.status(200).json(existingUser);
+    }
+
+    let userEmail = email;
+    if (!userEmail && req.auth?.userId) {
+      userEmail = `user-${clerkId}@example.com`;
+    }
+
+    if (!userEmail) {
+      return res.status(400).json({
+        error: 'Email is required'
       });
     }
 
     const user = await userService.createClerkUser({
       clerkId,
-      email,
+      email: userEmail,
       name,
       id: undefined
     });
+
     res.status(201).json(user);
   } catch (error) {
     logger.error(`Error in createClerkUser controller: ${(error as Error).message}`);
