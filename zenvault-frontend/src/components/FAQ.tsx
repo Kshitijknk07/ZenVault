@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 const faqs = [
@@ -29,60 +29,92 @@ const faqs = [
 ];
 
 const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <div id="faq" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:text-center animate-fade-in">
-          <h2 className="text-sm text-indigo-600 font-bold tracking-widest uppercase">FAQ</h2>
-          <p className="mt-4 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl leading-tight">
-            Common questions<br className="hidden sm:block" /> answered
-          </p>
-          <p className="mt-6 max-w-2xl text-xl text-gray-600 lg:mx-auto leading-relaxed">
+    <div id="faq" className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-radial from-accent/5 via-transparent to-transparent opacity-60"></div>
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="max-w-3xl mx-auto text-center mb-16 animate-fade-in">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-accent/10 text-accent mb-6 text-sm font-medium">
+            <HelpCircle className="h-4 w-4 mr-2" />
+            <span>FAQ</span>
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight mb-6">
+            Common <span className="text-gradient">questions</span> answered
+          </h2>
+
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Everything you need to know about ZenVault. Can't find the answer you're looking for? Feel free to contact our support team.
           </p>
         </div>
 
-        <div className="mt-20 max-w-3xl mx-auto">
-          <dl className="space-y-8">
-            {faqs.map((faq, index) => (
-              <div 
-                key={index} 
-                className={`transition-all duration-300 animate-fade-in bg-white rounded-2xl border border-gray-100 overflow-hidden ${openIndex === index ? 'shadow-md' : 'hover:shadow-sm'}`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <dt>
-                  <button
-                    onClick={() => toggleFAQ(index)}
-                    className="flex w-full items-start justify-between px-6 py-5 text-left transition-all duration-200 hover:bg-gray-50"
-                  >
-                    <span className="text-lg font-semibold text-gray-900">{faq.question}</span>
-                    <span className="ml-6 flex h-7 items-center">
-                      {openIndex === index ? (
-                        <ChevronUp className="h-6 w-6 text-indigo-600 transition-transform duration-200 transform rotate-0" />
-                      ) : (
-                        <ChevronDown className="h-6 w-6 text-gray-400 transition-transform duration-200 transform rotate-0" />
-                      )}
-                    </span>
-                  </button>
-                </dt>
-                <dd 
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-border shadow-sm p-6 sm:p-8">
+            <dl className="space-y-6">
+              {faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className={`transition-all duration-300 animate-fade-in overflow-hidden ${
+                    index !== faqs.length - 1 ? 'border-b border-border pb-6' : ''
                   }`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="px-6 pb-5">
-                    <p className="text-base text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </div>
-                </dd>
+                  <dt>
+                    <button
+                      onClick={() => toggleFAQ(index)}
+                      className="flex w-full items-start justify-between text-left transition-all duration-200 group"
+                      aria-expanded={openIndex === index}
+                    >
+                      <span className="text-lg font-semibold group-hover:text-accent transition-colors duration-200">{faq.question}</span>
+                      <span className="ml-6 flex h-7 items-center">
+                        <div className={`h-7 w-7 rounded-full flex items-center justify-center transition-all duration-200 ${
+                          openIndex === index ? 'bg-accent text-white' : 'bg-secondary text-foreground group-hover:bg-accent/10'
+                        }`}>
+                          {openIndex === index ? (
+                            <ChevronUp className="h-5 w-5 transition-transform duration-200" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 transition-transform duration-200" />
+                          )}
+                        </div>
+                      </span>
+                    </button>
+                  </dt>
+                  <dd
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                      openIndex === index ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0'
+                    }`}
+                  >
+                    <div className="text-muted-foreground leading-relaxed">{faq.answer}</div>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div className="mt-16 bg-gradient-accent rounded-2xl p-8 text-white shadow-accent-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h3 className="text-2xl font-bold mb-2">Still have questions?</h3>
+                <p className="text-white/80">
+                  Can't find the answer you're looking for? Please contact our friendly support team.
+                </p>
               </div>
-            ))}
-          </dl>
+              <a
+                href="mailto:support@zenvault.com"
+                className="inline-flex items-center px-6 py-3 bg-white text-accent font-medium rounded-lg hover:bg-white/90 transition-all duration-200 whitespace-nowrap"
+              >
+                <Mail className="h-5 w-5 mr-2" />
+                Contact Support
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

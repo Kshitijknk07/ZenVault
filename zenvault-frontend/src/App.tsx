@@ -14,9 +14,11 @@ import { useEffect } from 'react';
 import { userApi } from './lib/api';
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-white text-black">
+  <div className="min-h-screen bg-background text-foreground font-jakarta">
     <Navbar />
-    {children}
+    <main className="flex-grow">
+      {children}
+    </main>
     <Footer />
   </div>
 );
@@ -30,11 +32,8 @@ const App = () => {
       const syncUserWithBackend = async () => {
         try {
           const primaryEmail = user.primaryEmailAddress?.emailAddress;
-
           const name = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim();
-
           await userApi.createClerkUser(userId, primaryEmail, name);
-          console.log('User synced with backend successfully');
         } catch (error) {
           console.error('Error syncing user with backend:', error);
         }
@@ -49,13 +48,13 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={
-            <>
+            <div className="bg-grid">
               <Hero />
               <Features />
               <Pricing />
               <Creator />
               <FAQ />
-            </>
+            </div>
           } />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
