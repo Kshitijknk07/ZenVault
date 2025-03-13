@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -13,15 +13,20 @@ import { useAuth, useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { userApi } from './lib/api';
 
-const Layout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-background text-foreground font-jakarta">
-    <Navbar />
-    <main className="flex-grow">
-      {children}
-    </main>
-    <Footer />
-  </div>
-);
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+  return (
+    <div className="min-h-screen bg-background text-foreground font-jakarta">
+      {!isAuthPage && <Navbar />}
+      <main className={`flex-grow ${isAuthPage ? 'min-h-screen' : ''}`}>
+        {children}
+      </main>
+      {!isAuthPage && <Footer />}
+    </div>
+  );
+};
 
 const App = () => {
   const { isSignedIn, userId } = useAuth();
