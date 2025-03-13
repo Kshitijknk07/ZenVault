@@ -2,50 +2,8 @@ import { SignIn } from "@clerk/clerk-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
 import { Shield, Lock, ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
-import { useEffect } from "react"
 
 const Login = () => {
-  useEffect(() => {
-    const applyClerkStyles = () => {
-      const clerkRoot = document.querySelector('.cl-rootBox')
-      if (clerkRoot) {
-        clerkRoot.setAttribute('style', 'width: 100%; max-width: 100%;')
-
-        const formElements = document.querySelectorAll('.cl-formButtonPrimary')
-        formElements.forEach(el => {
-          el.setAttribute('style', 'background: linear-gradient(135deg, hsl(243, 75%, 59%), hsl(243, 75%, 59%, 0.8)); font-family: "Plus Jakarta Sans", sans-serif;')
-        })
-
-        const inputElements = document.querySelectorAll('.cl-formFieldInput')
-        inputElements.forEach(el => {
-          el.setAttribute('style', 'border-radius: 0.75rem; font-family: "Plus Jakarta Sans", sans-serif;')
-        })
-
-        const socialButtons = document.querySelectorAll('.cl-socialButtonsIconButton')
-        socialButtons.forEach(el => {
-          el.setAttribute('style', 'border-radius: 0.75rem; font-family: "Plus Jakarta Sans", sans-serif;')
-        })
-      }
-    }
-
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach(() => {
-        applyClerkStyles()
-      })
-    })
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    })
-
-    applyClerkStyles()
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-radial from-accent/5 to-transparent p-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-30"></div>
@@ -69,7 +27,6 @@ const Login = () => {
       </div>
 
       <Card className="w-full max-w-md shadow-soft-xl border-border bg-white/95 backdrop-blur-sm relative z-10">
-        <div className="absolute -top-1 -bottom-1 -left-1 -right-1 rounded-2xl bg-gradient-to-r from-accent/20 via-accent/0 to-accent/20 animate-pulse-slow -z-10"></div>
         <CardHeader className="space-y-1 text-center pb-2">
           <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
           <CardDescription>Sign in to your account to continue</CardDescription>

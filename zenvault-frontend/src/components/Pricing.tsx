@@ -60,7 +60,7 @@ const Pricing = () => {
       <div className="absolute inset-0 bg-gradient-radial from-accent/5 via-transparent to-transparent opacity-60"></div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-16 animate-fade-in">
+        <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-accent/10 text-accent mb-6 text-sm font-medium">
             <CreditCard className="h-4 w-4 mr-2" />
             <span>Simple Pricing</span>
@@ -79,25 +79,11 @@ const Pricing = () => {
           {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl overflow-hidden transition-all duration-300 animate-fade-in bg-white/80 backdrop-blur-sm border border-border hover:border-accent/20 shadow-sm hover:shadow-soft-xl ${
-                plan.popular ? 'md:scale-105 md:shadow-soft-xl z-10' : ''
-              }`}
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="relative rounded-2xl overflow-hidden bg-white/95 backdrop-blur-sm border border-border hover:border-accent/20 shadow-sm hover:shadow-soft-xl"
             >
-              {plan.popular && (
-                <div className="absolute top-0 inset-x-0">
-                  <div className="flex justify-center -translate-y-1/2">
-                    <div className="px-4 py-1 rounded-full bg-gradient-accent text-white text-xs font-medium shadow-accent-sm flex items-center">
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      Most Popular
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="px-6 sm:px-8 py-8 sm:py-10">
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-muted-foreground">{plan.description}</p>
+                <p className="text-muted-foreground text-sm">{plan.description}</p>
 
                 <div className="mt-6 flex items-baseline">
                   <span className="text-4xl sm:text-5xl font-extrabold">{plan.price}</span>
@@ -108,11 +94,11 @@ const Pricing = () => {
                   <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-muted-foreground">What's included</h4>
                   <ul className="space-y-4">
                     {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start group">
-                        <div className="flex-shrink-0 h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center mt-0.5 transition-all duration-200 group-hover:bg-accent/20">
+                      <li key={feature} className="flex items-start">
+                        <div className="flex-shrink-0 h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center mt-0.5">
                           <Check className="h-3 w-3 text-accent" />
                         </div>
-                        <span className="ml-3 text-base">{feature}</span>
+                        <span className="ml-3 text-sm text-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -121,13 +107,8 @@ const Pricing = () => {
                 <div className="mt-10">
                   <Link
                     to={plan.ctaLink}
-                    className={`w-full px-6 py-3 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-center ${
-                      plan.popular
-                        ? 'bg-gradient-accent text-white shadow-accent-sm hover:shadow-accent-glow'
-                        : 'bg-secondary hover:bg-secondary/80 text-foreground'
-                    }`}
+                    className="w-full px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center bg-secondary hover:bg-secondary/80 text-foreground"
                   >
-                    {plan.popular && <Zap className="h-4 w-4 mr-2" />}
                     {plan.cta}
                   </Link>
                 </div>
@@ -136,16 +117,16 @@ const Pricing = () => {
           ))}
         </div>
 
-        <div className="mt-20 bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-border shadow-sm">
+        <div className="mt-20 bg-white/95 backdrop-blur-sm rounded-2xl p-8 border border-border shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-2xl font-bold mb-4">Frequently Asked Questions</h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground text-sm mb-6">
                 Have questions about our pricing? Here are some common questions we get asked.
               </p>
               <Link
                 to="#faq"
-                className="inline-flex items-center text-accent hover:text-accent/80 font-medium"
+                className="inline-flex items-center text-accent hover:text-accent/80 font-medium text-sm"
               >
                 View all FAQs
                 <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,8 +147,8 @@ const Pricing = () => {
                 },
               ].map((faq, i) => (
                 <div key={i} className="pb-4 border-b border-border last:border-0 last:pb-0">
-                  <h4 className="text-lg font-semibold mb-2">{faq.q}</h4>
-                  <p className="text-muted-foreground">{faq.a}</p>
+                  <h4 className="text-base font-semibold mb-2">{faq.q}</h4>
+                  <p className="text-sm text-muted-foreground">{faq.a}</p>
                 </div>
               ))}
             </div>

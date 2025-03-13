@@ -29,7 +29,7 @@ const faqs = [
 ];
 
 const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -40,7 +40,7 @@ const FAQ = () => {
       <div className="absolute inset-0 bg-gradient-radial from-accent/5 via-transparent to-transparent opacity-60"></div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-16 animate-fade-in">
+        <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-accent/10 text-accent mb-6 text-sm font-medium">
             <HelpCircle className="h-4 w-4 mr-2" />
             <span>FAQ</span>
@@ -61,10 +61,9 @@ const FAQ = () => {
               {faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className={`transition-all duration-300 animate-fade-in overflow-hidden ${
+                  className={`transition-all duration-300 overflow-hidden ${
                     index !== faqs.length - 1 ? 'border-b border-border pb-6' : ''
                   }`}
-                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <dt>
                     <button
@@ -86,12 +85,8 @@ const FAQ = () => {
                       </span>
                     </button>
                   </dt>
-                  <dd
-                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                      openIndex === index ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0'
-                    }`}
-                  >
-                    <div className="text-muted-foreground leading-relaxed">{faq.answer}</div>
+                  <dd className={`mt-2 text-muted-foreground ${openIndex === index ? 'block' : 'hidden'}`}>
+                    {faq.answer}
                   </dd>
                 </div>
               ))}
