@@ -1,10 +1,9 @@
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || 'An error occurred');
+    throw new Error(errorData.error || "An error occurred");
   }
   return response.json();
 };
@@ -12,9 +11,9 @@ const handleResponse = async (response: Response) => {
 export const userApi = {
   createClerkUser: async (clerkId: string, email?: string, name?: string) => {
     const response = await fetch(`${API_URL}/users/clerk`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         clerkId,
@@ -25,6 +24,9 @@ export const userApi = {
     return handleResponse(response);
   },
 
+  /**
+   * Get the current user's profile
+   */
   getProfile: async (token: string) => {
     const response = await fetch(`${API_URL}/users/me`, {
       headers: {
@@ -36,9 +38,9 @@ export const userApi = {
 
   updateProfile: async (token: string, data: any) => {
     const response = await fetch(`${API_URL}/users/me`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
@@ -50,10 +52,10 @@ export const userApi = {
 export const fileApi = {
   uploadFile: async (token: string, file: File) => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     const response = await fetch(`${API_URL}/files/upload`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -62,18 +64,18 @@ export const fileApi = {
     return handleResponse(response);
   },
 
-  downloadFile: async (token: string, fileId: string) => {
+  getFileDownloadUrl: async (token: string, fileId: string) => {
     const response = await fetch(`${API_URL}/files/${fileId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response;
+    return handleResponse(response);
   },
 
   deleteFile: async (token: string, fileId: string) => {
     const response = await fetch(`${API_URL}/files/${fileId}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
       },

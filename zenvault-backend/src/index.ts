@@ -7,6 +7,10 @@ import fileRoutes from './routes/fileRoutes';
 import userRoutes from './routes/userRoutes';
 import { attachUser } from './middleware/authMiddleware';
 import { logger } from './utils/logger';
+import { initializeStorage } from './config/storage.config';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -25,14 +29,32 @@ app.get('/', (req, res) => {
   res.send('ZenVault Backend is Running! 🚀');
 });
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error(err.stack);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    logger.error(err.stack);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    });
+  }
+);
 
-app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await initializeStorage();
+
+    app.listen(PORT, () => {
+      logger.info(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    logger.error(`Failed to start server: ${(error as Error).message}`);
+    process.exit(1);
+  }
+};
+
+startServer();
