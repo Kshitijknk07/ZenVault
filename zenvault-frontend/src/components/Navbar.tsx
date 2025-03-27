@@ -1,4 +1,4 @@
-import { Menu, X, Shield, User, LogOut } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, HardDrive } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, useUser } from '@clerk/clerk-react';
@@ -46,13 +46,12 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/80 backdrop-blur-md shadow-sm'
-          : isHomePage
-            ? 'bg-transparent'
-            : 'bg-white'
-      }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+        ? 'bg-white/80 backdrop-blur-md shadow-sm'
+        : isHomePage
+          ? 'bg-transparent'
+          : 'bg-white'
+        }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
@@ -105,6 +104,13 @@ const Navbar = () => {
               {isSignedIn ? (
                 <>
                   <Link
+                    to="/dashboard"
+                    className="flex items-center text-foreground hover:text-accent px-4 py-2 rounded-md text-sm font-medium mr-2 transition-all duration-200"
+                  >
+                    <HardDrive className="h-4 w-4 mr-1.5" />
+                    Dashboard
+                  </Link>
+                  <Link
                     to="/profile"
                     className="flex items-center text-foreground hover:text-accent px-4 py-2 rounded-md text-sm font-medium mr-2 transition-all duration-200"
                   >
@@ -152,9 +158,8 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       <div
-        className={`fixed inset-0 bg-white z-40 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        } md:hidden`}
+        className={`fixed inset-0 bg-white z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          } md:hidden`}
       >
         <div className="flex justify-end p-4">
           <button
@@ -204,6 +209,14 @@ const Navbar = () => {
         <div className="pt-4 pb-3 border-t border-border">
           {isSignedIn ? (
             <div className="px-5 space-y-3">
+              <Link
+                to="/dashboard"
+                className="flex items-center justify-center text-foreground hover:text-accent px-4 py-3 rounded-md text-base font-medium w-full transition-all duration-200"
+                onClick={() => setIsOpen(false)}
+              >
+                <HardDrive className="h-5 w-5 mr-2" />
+                Dashboard
+              </Link>
               <Link
                 to="/profile"
                 className="flex items-center justify-center text-foreground hover:text-accent px-4 py-3 rounded-md text-base font-medium w-full transition-all duration-200"
