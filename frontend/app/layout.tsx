@@ -1,33 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { RootLayout } from "@/components/layout/RootLayout";
 
 export const metadata: Metadata = {
-  title: "ZenVault",
-  description: "Secure and peaceful storage for your digital assets",
+  title: "ZenVault - Secure Your Digital Assets",
+  description:
+    "The most secure and peaceful way to store, manage, and protect your valuable digital assets.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="en" className={GeistSans.className}>
+      <body className="min-h-screen bg-background text-foreground">
+        <RootLayout>{children}</RootLayout>
       </body>
     </html>
   );
