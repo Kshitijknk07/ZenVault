@@ -1,4 +1,3 @@
-
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { SparklesCore } from "@/components/ui/sparkles";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import {
   ArrowRight,
   Cloud,
@@ -41,10 +42,12 @@ export function HeroSection() {
             Secure Your Digital World with{" "}
             <span className="gradient-text">ZenVault</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-[700px] animate-fade-in">
-            A cloud storage platform that combines uncompromising security with
-            intuitive design. Store, sync, and share files with confidence.
-          </p>
+
+          <TextGenerateEffect
+            words="A cloud storage platform that combines uncompromising security with intuitive design. Store, sync, and share files with confidence."
+            className="text-lg md:text-xl text-muted-foreground max-w-[700px]"
+          />
+
           <div className="flex flex-col sm:flex-row gap-3 pt-6 animate-fade-in">
             <Button size="lg" className="gap-1">
               Get Started Free <ArrowRight className="h-4 w-4" />
