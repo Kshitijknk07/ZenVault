@@ -1,24 +1,39 @@
 const express = require("express");
 const router = express.Router();
 const folderController = require("../../controllers/folders/folderController");
-const { protect } = require("../../middleware/auth/authMiddleware");
+const {
+  protect,
+  extractUser,
+} = require("../../middleware/auth/clerkMiddleware");
 
-router.post("/", protect, folderController.createFolder);
-
-router.get("/:id", protect, folderController.getFolderDetails);
-
-router.get("/:id/contents", protect, folderController.getFolderContents);
-
-router.put("/:id/rename", protect, folderController.renameFolder);
-
-router.put("/:id/trash", protect, folderController.moveFolderToTrash);
-
-router.put("/:id/restore", protect, folderController.restoreFolderFromTrash);
-
-router.delete("/:id", protect, folderController.deleteFolderPermanently);
-
-router.get("/trash", protect, folderController.getFoldersInTrash);
-
-router.get("/search", protect, folderController.searchFolders);
+router.post("/", protect, extractUser, folderController.createFolder);
+router.get("/:id", protect, extractUser, folderController.getFolderDetails);
+router.get(
+  "/:id/contents",
+  protect,
+  extractUser,
+  folderController.getFolderContents
+);
+router.put("/:id/rename", protect, extractUser, folderController.renameFolder);
+router.put(
+  "/:id/trash",
+  protect,
+  extractUser,
+  folderController.moveFolderToTrash
+);
+router.put(
+  "/:id/restore",
+  protect,
+  extractUser,
+  folderController.restoreFolderFromTrash
+);
+router.delete(
+  "/:id",
+  protect,
+  extractUser,
+  folderController.deleteFolderPermanently
+);
+router.get("/trash", protect, extractUser, folderController.getFoldersInTrash);
+router.get("/search", protect, extractUser, folderController.searchFolders);
 
 module.exports = router;

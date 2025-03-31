@@ -1,13 +1,24 @@
 const db = require("../config/db");
 
-const createUser = async (userData) => {
-  const { username, email, password } = userData;
+const createUserFromClerk = async (userData) => {
+  const { clerkId, username, email } = userData;
   const query =
-    "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *";
-  const values = [username, email, password];
+    "INSERT INTO users (clerk_id, username, email, password) VALUES ($1, $2, $3, $4) RETURNING *";
+  const values = [clerkId, username, email, "clerk-auth-user"];
 
   try {
     const result = await db.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getUserByClerkId = async (clerkId) => {
+  const query = "SELECT * FROM users WHERE clerk_id = $1";
+
+  try {
+    const result = await db.query(query, [clerkId]);
     return result.rows[0];
   } catch (error) {
     throw error;
@@ -37,7 +48,8 @@ const getUserById = async (id) => {
 };
 
 module.exports = {
-  createUser,
+  createUserFromClerk,
+  getUserByClerkId,
   getUserByEmail,
   getUserById,
 };

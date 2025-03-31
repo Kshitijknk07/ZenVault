@@ -1,15 +1,10 @@
--- Users table
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(100) NOT NULL,
-  email VARCHAR(100) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  storage_used BIGINT DEFAULT 0,
-  storage_limit BIGINT DEFAULT 5368709120,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Users table (update to include clerk_id if it doesn't exist)
+ALTER TABLE IF EXISTS users ADD COLUMN IF NOT EXISTS clerk_id VARCHAR(100) UNIQUE;
 
+-- Create index for clerk_id if it doesn't exist
+CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id);
+
+-- Rest of the database schema remains the same
 -- Folders table
 CREATE TABLE IF NOT EXISTS folders (
   id SERIAL PRIMARY KEY,
