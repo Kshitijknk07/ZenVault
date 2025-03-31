@@ -1,0 +1,84 @@
+import { useUser } from "@clerk/clerk-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { FileIcon, FolderIcon, UploadIcon } from "lucide-react";
+
+const Dashboard = () => {
+  const { user } = useUser();
+
+  return (
+    <div className="container mx-auto p-4">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold">
+          Welcome, {user?.firstName || user?.username || "User"}!
+        </h1>
+        <p className="text-muted-foreground">
+          Manage your files securely with ZenVault
+        </p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Storage</CardTitle>
+            <CardDescription>Your storage usage</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-2 bg-secondary rounded-full mb-2">
+              <div className="h-full bg-primary rounded-full w-1/4"></div>
+            </div>
+            <p className="text-sm text-muted-foreground">25% used of 5GB</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Files</CardTitle>
+            <CardDescription>Your uploaded files</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center">
+            <FileIcon className="mr-2 h-5 w-5 text-primary" />
+            <span className="text-2xl font-bold">12</span>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Folders</CardTitle>
+            <CardDescription>Your created folders</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center">
+            <FolderIcon className="mr-2 h-5 w-5 text-primary" />
+            <span className="text-2xl font-bold">3</span>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex flex-wrap gap-4 mb-8">
+        <Button className="flex items-center">
+          <UploadIcon className="mr-2 h-4 w-4" /> Upload File
+        </Button>
+        <Button variant="outline" className="flex items-center">
+          <FolderIcon className="mr-2 h-4 w-4" /> New Folder
+        </Button>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-bold mb-4">Recent Files</h2>
+        <div className="bg-card rounded-lg border p-4">
+          <p className="text-center text-muted-foreground py-8">
+            No recent files to display
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
