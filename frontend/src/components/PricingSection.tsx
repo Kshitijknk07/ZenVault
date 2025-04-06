@@ -1,8 +1,12 @@
-
 import { Check, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const plans = [
   {
@@ -81,9 +85,7 @@ export function PricingSection() {
               }`}
             >
               {plan.popular && (
-                <Badge
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground"
-                >
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground">
                   Most Popular
                 </Badge>
               )}
@@ -94,7 +96,9 @@ export function PricingSection() {
                   <span className="text-5xl font-bold">{plan.price}</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
-                <p className="text-sm text-muted-foreground">{plan.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {plan.description}
+                </p>
               </div>
 
               <div className="space-y-3 mb-6">

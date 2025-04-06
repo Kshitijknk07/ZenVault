@@ -3,7 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 
-const { ClerkExpressRequireAuth } = require("@clerk/clerk-sdk-node");
+const { ClerkExpressRequireAuth } = require("@clerk/express");
 
 dotenv.config();
 

@@ -1,9 +1,7 @@
-const {
-  clerkClient,
-  ClerkExpressRequireAuth,
-} = require("@clerk/clerk-sdk-node");
+const { clerkClient } = require("@clerk/clerk-sdk-node");
+const { requireAuth } = require("@clerk/express");
 
-const protect = ClerkExpressRequireAuth({
+const protect = requireAuth({
   onError: (err, req, res) => {
     res
       .status(401)
@@ -16,7 +14,6 @@ const extractUser = async (req, res, next) => {
     try {
       req.user = {
         id: req.auth.userId,
-
         email: req.auth.sessionClaims.email,
         username:
           req.auth.sessionClaims.username || req.auth.sessionClaims.email,

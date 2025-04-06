@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -12,9 +11,9 @@ export function CallToAction() {
             Ready to Secure Your Digital Future?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto">
-            Join thousands of users who trust ZenVault with their important files. 
-            Get started now with a free account and experience the perfect balance of 
-            security and simplicity.
+            Join thousands of users who trust ZenVault with their important
+            files. Get started now with a free account and experience the
+            perfect balance of security and simplicity.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button size="lg" className="gap-1">

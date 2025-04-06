@@ -2,7 +2,6 @@ const folderModel = require("../../models/folders/folderModel");
 const fileModel = require("../../models/files/fileModel");
 const db = require("../../config/db");
 
-
 const createFolder = async (req, res, next) => {
   try {
     const { name, parentFolderId } = req.body;
@@ -12,7 +11,6 @@ const createFolder = async (req, res, next) => {
       return res.status(400).json({ message: "Folder name is required" });
     }
 
-    
     if (parentFolderId) {
       const parentFolder = await folderModel.getFolderById(
         parentFolderId,
@@ -23,14 +21,12 @@ const createFolder = async (req, res, next) => {
       }
     }
 
-    
     let targetParentId = parentFolderId;
     if (!targetParentId) {
       const rootFolder = await folderModel.getRootFolder(userId);
       targetParentId = rootFolder ? rootFolder.id : null;
     }
 
-    
     const folderData = {
       name,
       userId,
@@ -49,7 +45,6 @@ const createFolder = async (req, res, next) => {
   }
 };
 
-
 const getFolderDetails = async (req, res, next) => {
   try {
     const folderId = req.params.id;
@@ -66,22 +61,18 @@ const getFolderDetails = async (req, res, next) => {
   }
 };
 
-
 const getFolderContents = async (req, res, next) => {
   try {
     const folderId = req.params.id;
     const userId = req.user.id;
 
-    
     const folder = await folderModel.getFolderById(folderId, userId);
     if (!folder) {
       return res.status(404).json({ message: "Folder not found" });
     }
 
-    
     const subfolders = await folderModel.getSubfolders(folderId, userId);
 
-    
     const files = await fileModel.getFilesInFolder(folderId, userId);
 
     res.status(200).json({
@@ -94,7 +85,6 @@ const getFolderContents = async (req, res, next) => {
   }
 };
 
-
 const renameFolder = async (req, res, next) => {
   try {
     const folderId = req.params.id;
@@ -105,7 +95,6 @@ const renameFolder = async (req, res, next) => {
       return res.status(400).json({ message: "New folder name is required" });
     }
 
-    
     const folder = await folderModel.getFolderById(folderId, userId);
     if (!folder) {
       return res.status(404).json({ message: "Folder not found" });
@@ -126,19 +115,16 @@ const renameFolder = async (req, res, next) => {
   }
 };
 
-
 const moveFolderToTrash = async (req, res, next) => {
   try {
     const folderId = req.params.id;
     const userId = req.user.id;
 
-    
     const folder = await folderModel.getFolderById(folderId, userId);
     if (!folder) {
       return res.status(404).json({ message: "Folder not found" });
     }
 
-    
     if (folder.is_root) {
       return res.status(400).json({ message: "Cannot trash root folder" });
     }
@@ -153,7 +139,6 @@ const moveFolderToTrash = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const restoreFolderFromTrash = async (req, res, next) => {
   try {
@@ -183,13 +168,11 @@ const restoreFolderFromTrash = async (req, res, next) => {
   }
 };
 
-
 const deleteFolderPermanently = async (req, res, next) => {
   try {
     const folderId = req.params.id;
     const userId = req.user.id;
 
-    
     const folder = await db.query(
       "SELECT * FROM folders WHERE id = $1 AND user_id = $2",
       [folderId, userId]
@@ -199,20 +182,14 @@ const deleteFolderPermanently = async (req, res, next) => {
       return res.status(404).json({ message: "Folder not found" });
     }
 
-    
     if (folder.rows[0].is_root) {
       return res.status(400).json({ message: "Cannot delete root folder" });
     }
 
-    
     const deletedFolder = await folderModel.deleteFolderPermanently(
       folderId,
       userId
     );
-
-    
-    
-    
 
     res.status(200).json({
       message: "Folder and all its contents deleted permanently",
@@ -222,7 +199,6 @@ const deleteFolderPermanently = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const getFoldersInTrash = async (req, res, next) => {
   try {
@@ -241,7 +217,6 @@ const getFoldersInTrash = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const searchFolders = async (req, res, next) => {
   try {

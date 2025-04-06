@@ -3,7 +3,6 @@ const fileModel = require("../../models/files/fileModel");
 const folderModel = require("../../models/folders/folderModel");
 const userModel = require("../../models/userModel");
 
-
 const createShareLink = async (req, res, next) => {
   try {
     const { itemType, itemId, permission, isPublic, expiresAt } = req.body;
@@ -15,21 +14,18 @@ const createShareLink = async (req, res, next) => {
       });
     }
 
-    
     if (itemType !== "file" && itemType !== "folder") {
       return res.status(400).json({
         message: "Item type must be 'file' or 'folder'",
       });
     }
 
-    
     if (permission !== "view" && permission !== "edit") {
       return res.status(400).json({
         message: "Permission must be 'view' or 'edit'",
       });
     }
 
-    
     let item;
     if (itemType === "file") {
       item = await fileModel.getFileById(itemId, userId);
@@ -41,7 +37,6 @@ const createShareLink = async (req, res, next) => {
       return res.status(404).json({ message: "Item not found" });
     }
 
-    
     const shareData = {
       itemType,
       itemId,
@@ -62,7 +57,6 @@ const createShareLink = async (req, res, next) => {
   }
 };
 
-
 const shareWithUser = async (req, res, next) => {
   try {
     const { itemType, itemId, email, permission } = req.body;
@@ -74,21 +68,18 @@ const shareWithUser = async (req, res, next) => {
       });
     }
 
-    
     if (itemType !== "file" && itemType !== "folder") {
       return res.status(400).json({
         message: "Item type must be 'file' or 'folder'",
       });
     }
 
-    
     if (permission !== "view" && permission !== "edit") {
       return res.status(400).json({
         message: "Permission must be 'view' or 'edit'",
       });
     }
 
-    
     let item;
     if (itemType === "file") {
       item = await fileModel.getFileById(itemId, userId);
@@ -100,18 +91,15 @@ const shareWithUser = async (req, res, next) => {
       return res.status(404).json({ message: "Item not found" });
     }
 
-    
     const targetUser = await userModel.getUserByEmail(email);
     if (!targetUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    
     if (targetUser.id === userId) {
       return res.status(400).json({ message: "Cannot share with yourself" });
     }
 
-    
     const shareData = {
       itemType,
       itemId,
@@ -131,7 +119,6 @@ const shareWithUser = async (req, res, next) => {
   }
 };
 
-
 const getSharedItemByLink = async (req, res, next) => {
   try {
     const { shareLink } = req.params;
@@ -149,7 +136,6 @@ const getSharedItemByLink = async (req, res, next) => {
   }
 };
 
-
 const getItemsSharedWithMe = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -162,7 +148,6 @@ const getItemsSharedWithMe = async (req, res, next) => {
   }
 };
 
-
 const getItemsIShared = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -174,7 +159,6 @@ const getItemsIShared = async (req, res, next) => {
     next(error);
   }
 };
-
 
 const removeSharing = async (req, res, next) => {
   try {

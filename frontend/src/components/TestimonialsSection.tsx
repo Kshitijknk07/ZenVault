@@ -1,4 +1,3 @@
-
 import { Star, Quote } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -8,7 +7,8 @@ const testimonials = [
     role: "Marketing Director",
     company: "CreativeCorp",
     avatar: "https://i.pravatar.cc/150?img=1",
-    content: "ZenVault has transformed how we store and share our design assets. The security features give us peace of mind, and the interface is incredibly intuitive.",
+    content:
+      "ZenVault has transformed how we store and share our design assets. The security features give us peace of mind, and the interface is incredibly intuitive.",
     rating: 5,
   },
   {
@@ -16,7 +16,8 @@ const testimonials = [
     role: "IT Security Manager",
     company: "TechSecure",
     avatar: "https://i.pravatar.cc/150?img=3",
-    content: "As a security professional, I'm impressed with ZenVault's encryption standards. It meets all our compliance requirements while still being user-friendly.",
+    content:
+      "As a security professional, I'm impressed with ZenVault's encryption standards. It meets all our compliance requirements while still being user-friendly.",
     rating: 5,
   },
   {
@@ -24,7 +25,8 @@ const testimonials = [
     role: "Freelance Photographer",
     company: "MB Photography",
     avatar: "https://i.pravatar.cc/150?img=12",
-    content: "I need to know my client photos are protected, and ZenVault delivers. The ability to securely share files with clients has simplified my workflow immensely.",
+    content:
+      "I need to know my client photos are protected, and ZenVault delivers. The ability to securely share files with clients has simplified my workflow immensely.",
     rating: 5,
   },
 ];
@@ -38,7 +40,8 @@ export function TestimonialsSection() {
             Trusted by Professionals Worldwide
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Hear from our users who rely on ZenVault for their secure storage needs.
+            Hear from our users who rely on ZenVault for their secure storage
+            needs.
           </p>
         </div>
 
@@ -51,7 +54,10 @@ export function TestimonialsSection() {
               <Quote className="absolute top-6 right-6 h-8 w-8 text-muted/10" />
               <div className="flex items-center gap-4 mb-4">
                 <Avatar>
-                  <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                  <AvatarImage
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                  />
                   <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
