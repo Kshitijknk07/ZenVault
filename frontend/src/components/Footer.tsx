@@ -1,7 +1,9 @@
 import { Lock } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { siteConfig } from "@/config";
+import { Link } from "react-router-dom";
 
-export function Footer() {
+export function FooterOriginal() {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -226,6 +228,81 @@ export function Footer() {
               </svg>
             </a>
           </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer className="border-t py-12 bg-secondary/30">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="md:col-span-2">
+            <h3 className="text-xl font-bold mb-4">{siteConfig.name}</h3>
+            <p className="text-muted-foreground max-w-md">
+              Secure file management with uncompromising privacy and intuitive
+              design. Your data stays protected with our advanced local storage
+              solution.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-medium mb-4">Quick Links</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  to="/#features"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Features
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/#pricing"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Pricing
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/#security"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Security
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-medium mb-4">Legal</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  to="/privacy"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/terms"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Terms of Service
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
+          <p>
+            &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
+            reserved. Secure local storage for your digital assets.
+          </p>
         </div>
       </div>
     </footer>

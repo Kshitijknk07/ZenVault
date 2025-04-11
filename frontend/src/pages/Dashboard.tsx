@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
 import {
   Card,
   CardContent,
@@ -7,20 +7,35 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileIcon, FolderIcon, UploadIcon } from "lucide-react";
+import { FileIcon, FolderIcon, LogOutIcon, UploadIcon } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useUser();
+  const { signOut } = useClerk();
+
+  const handleLogout = () => {
+    signOut();
+    // This will redirect to the landing page after signing out
+  };
 
   return (
     <div className="container mx-auto p-4">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold">
-          Welcome, {user?.firstName || user?.username || "User"}!
-        </h1>
-        <p className="text-muted-foreground">
-          Manage your files securely with ZenVault
-        </p>
+      <header className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">
+            Welcome, {user?.firstName || user?.username || "User"}!
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your files securely with ZenVault
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="flex items-center"
+          onClick={handleLogout}
+        >
+          <LogOutIcon className="mr-2 h-4 w-4" /> Logout
+        </Button>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

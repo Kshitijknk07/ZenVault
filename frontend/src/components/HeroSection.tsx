@@ -10,7 +10,9 @@ import {
   Clock,
   Upload,
   Settings,
+  Shield,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
@@ -44,7 +46,7 @@ export function HeroSection() {
           </h1>
 
           <TextGenerateEffect
-            words="A cloud storage platform that combines uncompromising security with intuitive design. Store, sync, and share files with confidence."
+            words="A secure storage platform that combines uncompromising security with intuitive design. Store, sync, and share files with confidence."
             className="text-lg md:text-xl text-muted-foreground max-w-[700px]"
           />
 
@@ -176,6 +178,48 @@ export function HeroSection() {
               </div>
             </div>
             <Cloud className="absolute -bottom-6 -right-6 h-12 w-12 text-zen-blue animate-float" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function SimpleHeroSection() {
+  return (
+    <section className="py-20 md:py-32 relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background to-background/50 pointer-events-none" />
+
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+            Secure <span className="gradient-text">Local Storage</span> for Your
+            Digital Life
+          </h1>
+
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl">
+            ZenVault provides secure, private storage for your important files
+            with advanced encryption and intuitive organization - all stored
+            locally for maximum privacy.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <Button asChild size="lg" className="gap-2">
+              <Link to="/sign-up">
+                Get Started <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="gap-2">
+              <Link to="/#features">
+                Learn More <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Shield className="h-5 w-5 text-primary" />
+            <span>End-to-end encryption for maximum security</span>
           </div>
         </div>
       </div>

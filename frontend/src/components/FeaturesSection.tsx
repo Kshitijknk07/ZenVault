@@ -3,7 +3,7 @@ import {
   Folder,
   Share2,
   History,
-  Cloud,
+  Database,
   ShieldCheck,
 } from "lucide-react";
 
@@ -54,10 +54,10 @@ const features = [
     hoverBorder: "hover:border-zen-purple/30",
   },
   {
-    icon: Cloud,
+    icon: Database,
     title: "Storage Management",
     description:
-      "Monitor your storage usage with clear visual indicators. Know exactly how much space you have available.",
+      "Monitor your storage usage with clear visual indicators. Know exactly how much space you have available on your local storage.",
     color: "text-zen-teal",
     bgColor: "bg-zen-teal/10",
     hoverBorder: "hover:border-zen-teal/30",
@@ -73,10 +73,9 @@ export function FeaturesSection() {
             Powerful Features for Your Digital Life
           </h2>
 
-          {/* Regular paragraph instead of TextGenerateEffect */}
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             ZenVault provides all the tools you need to store, manage, and share
-            your files securely.
+            your files securely on your local system.
           </p>
         </div>
 

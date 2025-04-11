@@ -3,6 +3,14 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
+console.log("Database config:", {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  passwordProvided: process.env.DB_PASSWORD ? "Yes" : "No",
+});
+
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -22,5 +30,5 @@ pool.on("error", (err) => {
 
 module.exports = {
   query: (text, params) => pool.query(text, params),
-  pool,
+  getClient: () => pool.connect(),
 };
