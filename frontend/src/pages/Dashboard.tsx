@@ -10,27 +10,41 @@ import { Button } from "@/components/ui/button";
 import { FileIcon, FolderIcon, LogOutIcon, UploadIcon } from "lucide-react";
 import { FileManager } from "@/components/FileManager";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const Dashboard = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
-  const [usage, setUsage] = useState({ used: 0, total: 0 });
+  const [storageUsage, setStorageUsage] = useState({
+    used: 0,
+    limit: 5 * 1024 * 1024 * 1024,
+    percentage: 0,
+  });
+
+  useEffect(() => {
+    const fetchStorageUsage = async () => {
+      try {
+        const response = await axios.get("/api/storage/usage", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setStorageUsage({
+          used: response.data.storageUsed,
+          limit: response.data.storageLimit,
+          percentage: response.data.percentageUsed,
+        });
+      } catch (error) {
+        console.error("Failed to fetch storage usage:", error);
+      }
+    };
+
+    fetchStorageUsage();
+  }, []);
 
   const handleLogout = () => {
     signOut();
   };
-
-  useEffect(() => {
-    if (user?.id) {
-      fetch("/api/storage/usage", {
-        headers: {
-          "X-User-ID": user.id,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => setUsage(data));
-    }
-  }, [user]);
 
   return (
     <div className="container mx-auto p-4">
@@ -62,11 +76,12 @@ const Dashboard = () => {
             <div className="h-2 bg-secondary rounded-full mb-2">
               <div
                 className="h-full bg-primary rounded-full"
-                style={{ width: `${(usage.used / usage.total) * 100}%` }}
-              />
+                style={{ width: `${storageUsage.percentage}%` }}
+              ></div>
             </div>
             <p className="text-sm text-muted-foreground">
-              {usage.used} MB of {usage.total} MB used
+              {formatBytes(storageUsage.used)} used of{" "}
+              {formatBytes(storageUsage.limit)}
             </p>
           </CardContent>
         </Card>
@@ -108,6 +123,17 @@ const Dashboard = () => {
         <FileManager />
       </div>
     </div>
+  );
+};
+
+// Helper function to format bytes
+const formatBytes = (bytes, decimals = 2) => {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return (
+    parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + " " + sizes[i]
   );
 };
 
