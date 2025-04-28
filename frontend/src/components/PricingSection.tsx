@@ -10,50 +10,49 @@ import {
 
 const plans = [
   {
-    name: "Free",
-    price: "0",
-    description: "Essential secure storage for personal use",
+    name: "Community",
+    price: "Free",
+    description: "Personal, self-hosted storage for individuals",
     features: [
-      "5 GB secure storage",
-      "End-to-end encryption",
-      "File sharing with 3 users",
-      "Mobile and desktop access",
-      "Basic support",
+      "All core features",
+      "Store files locally on your own device or server",
+      "No cloud or third-party storage",
+      "Basic support via community forums",
+      "Open source",
     ],
-    limitations: ["No advanced sharing", "Limited version history"],
+    limitations: ["No official support", "No advanced admin tools"],
     cta: "Get Started",
     popular: false,
   },
   {
-    name: "Pro",
-    price: "9.99",
-    description: "Advanced security and features for professionals",
+    name: "Pro License",
+    price: "49",
+    description: "Advanced features and priority support for power users",
     features: [
-      "100 GB secure storage",
-      "Priority encryption",
-      "Unlimited file sharing",
-      "30-day version history",
+      "All Community features",
+      "Priority email support",
       "Advanced file recovery",
-      "Priority support",
+      "Extended version history",
       "Team collaboration tools",
+      "Commercial use allowed",
     ],
     limitations: [],
-    cta: "Try Free for 14 Days",
+    cta: "Buy License",
     popular: true,
   },
   {
-    name: "Business",
-    price: "29.99",
-    description: "Enterprise-grade solution for teams",
+    name: "Business License",
+    price: "199",
+    description:
+      "Enterprise-grade features and dedicated support for organizations",
     features: [
-      "1 TB secure storage per user",
-      "Advanced admin controls",
-      "Unlimited version history",
+      "All Pro features",
       "User management dashboard",
       "Custom security policies",
       "API access",
-      "24/7 dedicated support",
-      "Compliance reporting",
+      "On-premises deployment assistance",
+      "1 year of dedicated support",
+      "Compliance documentation",
     ],
     limitations: [],
     cta: "Contact Sales",
@@ -70,7 +69,8 @@ export function PricingSection() {
             Simple, Transparent Pricing
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose the perfect plan for your secure storage needs.
+            Choose the perfect plan for your local storage needs. All plans are
+            self-hosted—your files never leave your device or server.
           </p>
         </div>
 

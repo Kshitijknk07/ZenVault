@@ -221,7 +221,6 @@ export function SecuritySection() {
   );
 }
 
-// Sample connection points for the map
 const connectionPoints = [
   {
     start: { lat: 40.7128, lng: -74.006, label: "New York" }, // New York

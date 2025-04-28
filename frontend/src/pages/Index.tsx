@@ -3,7 +3,6 @@ import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { SecuritySection } from "@/components/SecuritySection";
-// Removed TestimonialsSection import
 import { PricingSection } from "@/components/PricingSection";
 import { CallToAction } from "@/components/CallToAction";
 import { Footer } from "@/components/Footer";

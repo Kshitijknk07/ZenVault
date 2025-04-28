@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import {
-  ArrowRight,
-  Cloud,
   ShieldCheck,
   Folder,
   Star,
@@ -11,20 +9,17 @@ import {
   Upload,
   Settings,
   Shield,
+  HardDrive,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden pt-24 md:pt-32 pb-16">
-      {/* Spotlight effect */}
       <div className="absolute -top-40 left-0 right-0 pointer-events-none">
         <div className="relative h-[800px] w-full">
           <div className="absolute inset-0 z-[-1] h-full w-full bg-gradient-to-r from-zen-blue via-zen-purple to-zen-teal opacity-20 blur-[100px] dark:opacity-10 animate-spotlight" />
         </div>
       </div>
-
-      {/* Sparkles effect */}
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <SparklesCore
           id="heroSparkles"
@@ -37,43 +32,30 @@ export function HeroSection() {
           className="w-full h-full"
         />
       </div>
-
       <div className="relative container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center text-center space-y-4">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight max-w-3xl animate-fade-in">
             Secure Your Digital World with{" "}
             <span className="gradient-text">ZenVault</span>
           </h1>
-
           <TextGenerateEffect
             words="A secure storage platform that combines uncompromising security with intuitive design. Store, sync, and share files with confidence."
             className="text-lg md:text-xl text-muted-foreground max-w-[700px]"
           />
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-6 animate-fade-in">
-            <Button size="lg" className="gap-1">
-              Get Started Free <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline">
-              Learn More
-            </Button>
-          </div>
           <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground animate-fade-in">
             <ShieldCheck className="h-4 w-4 text-accent" />
             <span>Your data is always encrypted and secure</span>
           </div>
         </div>
-
-        {/* Dashboard Preview */}
-        <div className="mt-16 md:mt-24 max-w-5xl mx-auto relative z-20 animate-fade-in">
+        <div className="mt-8 md:mt-12 max-w-5xl mx-auto relative z-20 animate-fade-in">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-zen-blue to-zen-purple opacity-20 blur-lg rounded-xl"></div>
             <div className="relative glass-card rounded-2xl shadow-2xl border border-white/10 dark:border-white/5 overflow-hidden p-4">
-              {/* Dashboard Header */}
               <div className="flex justify-between items-center mb-6 p-2">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-md bg-zen-blue/90 flex items-center justify-center">
-                    <Cloud className="h-5 w-5 text-white" />
+                    <HardDrive className="h-5 w-5 text-white" />{" "}
+                    {/* Changed from Cloud */}
                   </div>
                   <h3 className="font-semibold text-xl">ZenVault Dashboard</h3>
                 </div>
@@ -86,10 +68,7 @@ export function HeroSection() {
                   </Button>
                 </div>
               </div>
-
-              {/* Dashboard Content */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                {/* Storage Stats */}
                 <div className="bg-background/50 backdrop-blur-sm p-4 rounded-xl border border-white/10">
                   <h4 className="text-sm font-medium mb-2">Storage Used</h4>
                   <div className="w-full h-2 bg-muted rounded-full mb-2">
@@ -99,8 +78,6 @@ export function HeroSection() {
                     3.5 GB of 10 GB
                   </p>
                 </div>
-
-                {/* Quick Access */}
                 <div className="bg-background/50 backdrop-blur-sm p-4 rounded-xl border border-white/10">
                   <h4 className="text-sm font-medium mb-2">Quick Access</h4>
                   <div className="flex gap-2">
@@ -112,8 +89,6 @@ export function HeroSection() {
                     </Button>
                   </div>
                 </div>
-
-                {/* Security Status */}
                 <div className="bg-background/50 backdrop-blur-sm p-4 rounded-xl border border-white/10">
                   <h4 className="text-sm font-medium mb-2">Security Status</h4>
                   <div className="flex items-center gap-2">
@@ -124,8 +99,6 @@ export function HeroSection() {
                   </div>
                 </div>
               </div>
-
-              {/* Files List */}
               <div className="bg-background/30 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
                 <div className="flex justify-between items-center p-3 border-b border-white/5">
                   <h4 className="font-medium">Recent Files</h4>
@@ -177,7 +150,8 @@ export function HeroSection() {
                 </div>
               </div>
             </div>
-            <Cloud className="absolute -bottom-6 -right-6 h-12 w-12 text-zen-blue animate-float" />
+            <HardDrive className="absolute -bottom-6 -right-6 h-12 w-12 text-zen-blue animate-float" />{" "}
+            {/* Changed from Cloud */}
           </div>
         </div>
       </div>
@@ -190,33 +164,17 @@ export function SimpleHeroSection() {
     <section className="py-20 md:py-32 relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-background/50 pointer-events-none" />
-
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
             Secure <span className="gradient-text">Local Storage</span> for Your
             Digital Life
           </h1>
-
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl">
             ZenVault provides secure, private storage for your important files
             with advanced encryption and intuitive organization - all stored
             locally for maximum privacy.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            <Button asChild size="lg" className="gap-2">
-              <Link to="/sign-up">
-                Get Started <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link to="/#features">
-                Learn More <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-
           <div className="flex items-center gap-2 text-muted-foreground">
             <Shield className="h-5 w-5 text-primary" />
             <span>End-to-end encryption for maximum security</span>

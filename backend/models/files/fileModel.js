@@ -38,11 +38,27 @@ const getFileById = async (fileId, userId) => {
   }
 };
 
-const getFilesInFolder = async (folderId, userId) => {
+const getFilesInFolder = async (
+  folderId,
+  userId,
+  sortBy = "created_at",
+  order = "DESC"
+) => {
+  const validSortColumns = ["created_at", "name", "size"];
+  const validOrders = ["ASC", "DESC"];
+
+  if (!validSortColumns.includes(sortBy)) {
+    sortBy = "created_at";
+  }
+
+  if (!validOrders.includes(order)) {
+    order = "DESC";
+  }
+
   const query = `
     SELECT * FROM files 
     WHERE folder_id = $1 AND user_id = $2 AND is_trashed = false
-    ORDER BY created_at DESC
+    ORDER BY ${sortBy} ${order}
   `;
 
   try {

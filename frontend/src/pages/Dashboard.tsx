@@ -15,7 +15,6 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     signOut();
-    // This will redirect to the landing page after signing out
   };
 
   return (

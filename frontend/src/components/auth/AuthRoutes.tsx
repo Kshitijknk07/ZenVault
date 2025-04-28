@@ -6,7 +6,6 @@ import { Spinner } from "@/components/ui/spinner";
 export function AuthRoutes() {
   const { isSignedIn, isLoaded } = useAuth();
 
-  // Show loading state while Clerk is initializing
   if (!isLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -53,7 +52,7 @@ export function AuthRoutes() {
           isSignedIn ? (
             <Navigate to="/dashboard" replace />
           ) : (
-            <Navigate to="/sign-in" replace />
+            <Navigate to="/sign-up" replace />
           )
         }
       />

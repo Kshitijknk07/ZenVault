@@ -75,7 +75,7 @@ export function FeaturesSection() {
 
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             ZenVault provides all the tools you need to store, manage, and share
-            your files securely on your local system.
+            your files securely on your own device—never in the cloud.
           </p>
         </div>
 
