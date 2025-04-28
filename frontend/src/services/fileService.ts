@@ -36,3 +36,28 @@ export const downloadFile = async (fileId: string) => {
   });
   return response.data;
 };
+
+export const createFolder = async (name: string, parentFolderId?: string) => {
+  const response = await axios.post(
+    `${API_URL}/folders`,
+    {
+      name,
+      parentFolderId,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getFolderStructure = async () => {
+  const response = await axios.get(`${API_URL}/folders/structure`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return response.data;
+};
