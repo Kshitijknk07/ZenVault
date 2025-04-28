@@ -8,14 +8,29 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileIcon, FolderIcon, LogOutIcon, UploadIcon } from "lucide-react";
+import { FileManager } from "@/components/FileManager";
+import { useState, useEffect } from "react";
 
 const Dashboard = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
+  const [usage, setUsage] = useState({ used: 0, total: 0 });
 
   const handleLogout = () => {
     signOut();
   };
+
+  useEffect(() => {
+    if (user?.id) {
+      fetch("/api/storage/usage", {
+        headers: {
+          "X-User-ID": user.id,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => setUsage(data));
+    }
+  }, [user]);
 
   return (
     <div className="container mx-auto p-4">
@@ -45,9 +60,14 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="h-2 bg-secondary rounded-full mb-2">
-              <div className="h-full bg-primary rounded-full w-1/4"></div>
+              <div
+                className="h-full bg-primary rounded-full"
+                style={{ width: `${(usage.used / usage.total) * 100}%` }}
+              />
             </div>
-            <p className="text-sm text-muted-foreground">25% used of 5GB</p>
+            <p className="text-sm text-muted-foreground">
+              {usage.used} MB of {usage.total} MB used
+            </p>
           </CardContent>
         </Card>
 
@@ -85,11 +105,7 @@ const Dashboard = () => {
 
       <div className="mb-8">
         <h2 className="text-xl font-bold mb-4">Recent Files</h2>
-        <div className="bg-card rounded-lg border p-4">
-          <p className="text-center text-muted-foreground py-8">
-            No recent files to display
-          </p>
-        </div>
+        <FileManager />
       </div>
     </div>
   );
