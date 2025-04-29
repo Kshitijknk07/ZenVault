@@ -1,16 +1,17 @@
-import Navbar from "@/components/navbar";
-import Hero from "@/components/hero";
-import Footer from "@/components/footer";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Auth_Page from "./pages/Auth_Page";
+import Landing_Page from "./pages/Landing_Page";
+import Dashboard_Page from "./pages/Dashboard_Page";
 
-export function App() {
+function App() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1 flex items-center justify-center">
-        <Hero />
-      </main>
-      <Footer />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/auth" element={<Auth_Page />} />
+        <Route path="/" element={<Landing_Page />} />
+        <Route path="/dashboard" element={<Dashboard_Page />} />
+      </Routes>
+    </Router>
   );
 }
 

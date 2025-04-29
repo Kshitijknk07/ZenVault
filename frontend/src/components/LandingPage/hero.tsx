@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="py-20 md:py-32 flex items-center">
       <div className="container mx-auto px-4 text-center">
@@ -15,6 +17,7 @@ const HeroSection = () => {
         <Button
           size="lg"
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-6 h-auto"
+          onClick={() => navigate("/auth")}
         >
           Get Started
         </Button>
