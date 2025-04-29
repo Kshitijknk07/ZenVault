@@ -1,44 +1,23 @@
-import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-
-const ACCEPTED_TYPES = [
-  "image/*",
-  "video/*",
-  ".pdf",
-  ".doc",
-  ".docx",
-  ".xls",
-  ".xlsx",
-  ".ppt",
-  ".pptx",
-  ".txt",
-];
+import { useState } from "react";
+import { FileUpload } from "@/components/ui/file-upload";
+import { toast } from "@/hooks/use-toast";
 
 const UploadArea = () => {
-  const [dragActive, setDragActive] = useState(false);
+  const [, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
-    else if (e.type === "dragleave") setDragActive(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFiles(e.dataTransfer.files);
+  const handleFileUpload = (newFiles: File[]) => {
+    setFiles(newFiles);
+    if (newFiles.length > 0) {
+      uploadFiles(newFiles);
     }
   };
 
-  const handleFiles = (_files: FileList) => {
+  const uploadFiles = (filesToUpload: File[]) => {
     setUploading(true);
     setProgress(0);
+
     // Simulate upload progress
     let prog = 0;
     const interval = setInterval(() => {
@@ -46,49 +25,23 @@ const UploadArea = () => {
       setProgress(prog);
       if (prog >= 100) {
         clearInterval(interval);
-        setTimeout(() => setUploading(false), 500);
+        setTimeout(() => {
+          setUploading(false);
+          toast({
+            title: "Upload Complete",
+            description: `${filesToUpload.length} file(s) uploaded successfully.`,
+          });
+        }, 500);
       }
     }, 150);
     // TODO: Replace with actual upload logic
   };
 
-  const handleButtonClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFiles(e.target.files);
-    }
-  };
-
   return (
-    <div
-      className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center transition-colors ${
-        dragActive ? "border-primary bg-muted" : "border-muted"
-      }`}
-      onDragEnter={handleDrag}
-      onDragOver={handleDrag}
-      onDragLeave={handleDrag}
-      onDrop={handleDrop}
-    >
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={ACCEPTED_TYPES.join(",")}
-        multiple={false}
-        className="hidden"
-        onChange={handleInputChange}
-      />
-      <div className="text-center mb-4">
-        <p className="text-lg font-semibold mb-2">Drag & drop your file here</p>
-        <p className="text-muted-foreground mb-4">or</p>
-        <Button size="lg" onClick={handleButtonClick} disabled={uploading}>
-          Upload
-        </Button>
-      </div>
+    <div className="w-full">
+      <FileUpload onChange={handleFileUpload} />
       {uploading && (
-        <div className="w-full max-w-xs mt-4">
+        <div className="w-full mt-4">
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
               className="h-2 bg-primary transition-all"

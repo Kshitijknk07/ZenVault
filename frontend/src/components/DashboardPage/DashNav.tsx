@@ -14,10 +14,8 @@ const DashNav = () => {
     <nav className="w-full flex items-center justify-between px-6 py-3 bg-background border-b">
       {/* Logo / App Name */}
       <div className="flex items-center gap-2 text-xl font-bold text-primary">
-        <span className="bg-primary text-primary-foreground rounded-md px-2 py-1">
-          FV
-        </span>
-        FileVault
+        <span className="bg-primary text-primary-foreground rounded-md px-2 py-1"></span>
+        ZenVault
       </div>
       {/* Search Bar */}
       <div className="flex-1 flex justify-center">
