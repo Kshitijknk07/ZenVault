@@ -22,15 +22,15 @@ const StorageInfoCard = ({
   const strokeDashoffset = circumference - (percent / 100) * circumference;
 
   return (
-    <Card className="w-full max-w-xs">
+    <Card className="w-full max-w-xs bg-[#2c2c2e] border-[#3b82f6]/20 text-white">
       <CardHeader>
-        <CardTitle>Storage Usage</CardTitle>
+        <CardTitle className="text-white">Storage Usage</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
         <div className="relative w-24 h-24">
           <svg height="100%" width="100%" viewBox="0 0 80 80">
             <circle
-              stroke="#e5e7eb"
+              stroke="#3b82f620"
               fill="transparent"
               strokeWidth={stroke}
               r={normalizedRadius}
@@ -38,7 +38,7 @@ const StorageInfoCard = ({
               cy={40}
             />
             <circle
-              stroke="#6366f1"
+              stroke="#3b82f6"
               fill="transparent"
               strokeWidth={stroke}
               strokeLinecap="round"
@@ -55,7 +55,7 @@ const StorageInfoCard = ({
               textAnchor="middle"
               dy=".3em"
               fontSize="1.2em"
-              fill="#6366f1"
+              fill="#3b82f6"
               fontWeight="bold"
             >
               {percent}%
@@ -63,10 +63,10 @@ const StorageInfoCard = ({
           </svg>
         </div>
         <div className="text-center">
-          <div className="text-lg font-semibold">
+          <div className="text-lg font-semibold text-white">
             {usedMB} MB used out of {totalMB} GB
           </div>
-          <div className="text-muted-foreground text-sm">
+          <div className="text-white/70 text-sm">
             {totalFiles} files uploaded
           </div>
         </div>

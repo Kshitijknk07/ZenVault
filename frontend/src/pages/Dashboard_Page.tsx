@@ -34,11 +34,11 @@ export default function Dashboard_Page() {
   );
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-[#2c2c2e] text-white">
       <DashSide />
       <div className="flex-1 flex flex-col">
         <DashNav />
-        <main className="flex-1 p-6 space-y-6 bg-background">
+        <main className="flex-1 p-6 space-y-6 bg-[#2c2c2e]">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1 space-y-4">
               <UploadArea />

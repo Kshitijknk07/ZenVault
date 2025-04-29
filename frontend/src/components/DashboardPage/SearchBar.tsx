@@ -20,7 +20,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
         placeholder="Search files by name..."
         value={value}
         onChange={handleChange}
-        className="bg-background border-muted"
+        className="bg-[#2c2c2e] border-[#3b82f6]/30 text-white focus:border-[#3b82f6] focus:ring-[#3b82f6]/20"
       />
     </div>
   );
