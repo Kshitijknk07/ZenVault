@@ -4,12 +4,38 @@ import { useNavigate } from "react-router-dom";
 const Navbar = () => {
   const navigate = useNavigate();
   return (
-    <nav className="w-full py-4 border-b border-gray-100">
+    <nav className="w-full py-6 bg-[#2c2c2e] border-b border-[#3b82f6]/20">
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <div className="text-xl font-semibold">ZenVault</div>
-        <Button variant="outline" onClick={() => navigate("/auth")}>
-          Sign In
-        </Button>
+        <div className="text-2xl font-bold text-white flex items-center">
+          <span className="text-[#3b82f6] mr-2">Zen</span>Vault
+        </div>
+        <div className="flex items-center space-x-6">
+          <a
+            href="#features"
+            className="text-white hover:text-[#3b82f6] transition-colors hidden md:block"
+          >
+            Features
+          </a>
+          <a
+            href="#security"
+            className="text-white hover:text-[#3b82f6] transition-colors hidden md:block"
+          >
+            Security
+          </a>
+          <a
+            href="#pricing"
+            className="text-white hover:text-[#3b82f6] transition-colors hidden md:block"
+          >
+            Pricing
+          </a>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/auth")}
+            className="border-[#3b82f6] text-white hover:bg-[#3b82f6] transition-colors"
+          >
+            Sign In
+          </Button>
+        </div>
       </div>
     </nav>
   );

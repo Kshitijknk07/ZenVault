@@ -9,15 +9,15 @@ interface FeatureCardProps {
 
 const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps) => {
   return (
-    <Card className="border-0 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <Card className="border-0 bg-[#2c2c2e] text-white shadow-md hover:shadow-lg hover:shadow-[#3b82f6]/5 transition-all duration-300 h-full">
       <CardHeader>
-        <div className="bg-indigo-50 p-3 rounded-lg w-fit mb-4">
-          <Icon className="h-6 w-6 text-indigo-600" />
+        <div className="bg-[#3b82f6]/10 p-4 rounded-lg w-fit mb-4 border border-[#3b82f6]/20">
+          <Icon className="h-6 w-6 text-[#3b82f6]" />
         </div>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="text-white text-xl">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-600">{description}</p>
+        <p className="text-white/70">{description}</p>
       </CardContent>
     </Card>
   );

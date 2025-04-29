@@ -1,40 +1,83 @@
 import FeatureCard from "./FeatureCard";
-import { Upload, Lock, Globe, Zap } from "lucide-react";
+import {
+  Upload,
+  Lock,
+  Globe,
+  Zap,
+  Shield,
+  Clock,
+  Users,
+  Search,
+} from "lucide-react";
 
 const FeaturesSection = () => {
   const features = [
     {
       icon: Upload,
-      title: "Easy File Upload",
+      title: "Effortless File Upload",
       description:
-        "Drag and drop files to upload or select them from your device with a simple click.",
+        "Drag and drop multiple files or entire folders with our intuitive interface. Supports files up to 10GB in size.",
     },
     {
       icon: Lock,
-      title: "Secure Storage",
+      title: "End-to-End Encryption",
       description:
-        "All your files are encrypted end-to-end and protected with advanced security protocols.",
+        "Your files are encrypted before they leave your device and can only be decrypted by you or your authorized recipients.",
     },
     {
       icon: Globe,
       title: "Access Anywhere",
       description:
-        "Access your files from any device, anywhere in the world with an internet connection.",
+        "Seamlessly access your files from any device with our responsive web app, iOS and Android mobile apps.",
     },
     {
       icon: Zap,
-      title: "Fast & Reliable",
+      title: "Lightning-Fast Transfers",
       description:
-        "Experience lightning-fast uploads and downloads with our optimized infrastructure.",
+        "Our optimized infrastructure ensures rapid uploads and downloads even with large files or slower connections.",
+    },
+    {
+      icon: Shield,
+      title: "Advanced Permissions",
+      description:
+        "Set granular access controls, password protection, and expiration dates for shared files and folders.",
+    },
+    {
+      icon: Clock,
+      title: "Automatic Versioning",
+      description:
+        "Never lose your work with automatic file versioning that lets you restore previous versions with a single click.",
+    },
+    {
+      icon: Users,
+      title: "Seamless Collaboration",
+      description:
+        "Share files and folders with team members or clients and collaborate in real-time with comments and notifications.",
+    },
+    {
+      icon: Search,
+      title: "Powerful Search",
+      description:
+        "Quickly find any file with our advanced search capabilities that index file contents, metadata, and tags.",
     },
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-24 bg-[#2c2c2e]" id="features">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          Why Choose FileVault
-        </h2>
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center bg-[#3b82f6]/10 px-4 py-2 rounded-full mb-4 border border-[#3b82f6]/20">
+            <span className="text-sm text-white">Powerful Features</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Everything You Need for Secure File Management
+          </h2>
+          <p className="text-white/70 max-w-2xl mx-auto">
+            ZenVault combines powerful features with an intuitive interface to
+            give you complete control over your digital assets.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <FeatureCard
