@@ -2,10 +2,23 @@ import { useState } from "react";
 import { FileUpload } from "@/components/ui/file-upload";
 import { toast } from "@/hooks/use-toast";
 
+const ACCEPTED_TYPES = [
+  "image/*",
+  "video/*",
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".txt",
+];
+
 const UploadArea = () => {
   const [, setFiles] = useState<File[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [, setUploading] = useState(false);
+  const [, setProgress] = useState(0);
 
   const handleFileUpload = (newFiles: File[]) => {
     setFiles(newFiles);
@@ -39,20 +52,7 @@ const UploadArea = () => {
 
   return (
     <div className="w-full">
-      <FileUpload onChange={handleFileUpload} />
-      {uploading && (
-        <div className="w-full mt-4">
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className="h-2 bg-primary transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <div className="text-xs text-muted-foreground mt-1 text-center">
-            Uploading... {progress}%
-          </div>
-        </div>
-      )}
+      <FileUpload onChange={handleFileUpload} accept={ACCEPTED_TYPES} />
     </div>
   );
 };

@@ -27,8 +27,10 @@ const secondaryVariant = {
 
 export const FileUpload = ({
   onChange,
+  accept,
 }: {
   onChange?: (files: File[]) => void;
+  accept?: string[];
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,6 +51,19 @@ export const FileUpload = ({
     onDropRejected: (error) => {
       console.log(error);
     },
+    accept: accept
+      ? accept.reduce((acc, type) => {
+          // Convert file extensions and MIME types to the format expected by react-dropzone
+          if (type.startsWith(".")) {
+            // For file extensions like .pdf, .docx
+            acc[type] = [];
+          } else {
+            // For MIME types like image/*, video/*
+            acc[type] = [];
+          }
+          return acc;
+        }, {} as Record<string, string[]>)
+      : undefined,
   });
 
   return (
@@ -62,6 +77,7 @@ export const FileUpload = ({
           ref={fileInputRef}
           id="file-upload-handle"
           type="file"
+          accept={accept?.join(",")}
           onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
           className="hidden"
         />
