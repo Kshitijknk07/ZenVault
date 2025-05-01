@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { GalleryVerticalEnd } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -7,34 +6,74 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function LoginForm({
+export function SignupForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
-  const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
+  const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
+      const { error, user } = await signUp(email, password, name);
       if (error) throw error;
 
-      // Navigate to dashboard on successful login
-      navigate("/dashboard");
+      if (user) {
+        setSuccess(true);
+      }
     } catch (error: any) {
-      setError(error.message || "Failed to sign in");
+      setError(error.message || "Failed to sign up");
     } finally {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div
+        className={cn(
+          "flex flex-col gap-6 items-center text-center",
+          className
+        )}
+        {...props}
+      >
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#3b82f6]">
+          <GalleryVerticalEnd className="size-6 text-white" />
+        </div>
+        <h2 className="text-2xl font-bold">Registration Successful!</h2>
+        <p className="text-sm text-white/70">
+          Please check your email to confirm your account.
+        </p>
+        <Button
+          onClick={() => (window.location.href = "/auth")}
+          className="mt-4 bg-[#3b82f6] hover:bg-[#3b82f6]/90"
+        >
+          Go to Login
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -44,18 +83,17 @@ export function LoginForm({
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#3b82f6]">
               <GalleryVerticalEnd className="size-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold">Welcome to ZenVault</h1>
+            <h1 className="text-xl font-bold">Create Your ZenVault Account</h1>
             <div className="text-center text-sm text-white/70">
-              Don&apos;t have an account?{" "}
+              Already have an account?{" "}
               <a
                 href="#"
                 className="text-[#3b82f6] hover:underline underline-offset-4"
                 onClick={(e) => {
                   e.preventDefault();
-                  // This would be handled by the parent component toggling between login and signup
                 }}
               >
-                Sign up
+                Sign in
               </a>
             </div>
           </div>
@@ -67,6 +105,18 @@ export function LoginForm({
           )}
 
           <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="name" className="text-white/90">
+                Full Name (optional)
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="email" className="text-white/90">
                 Email
@@ -93,12 +143,25 @@ export function LoginForm({
                 required
               />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="confirmPassword" className="text-white/90">
+                Confirm Password
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
             <Button
               type="submit"
               className="w-full bg-[#3b82f6] hover:bg-[#3b82f6]/90"
               disabled={loading}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Creating Account..." : "Sign Up"}
             </Button>
           </div>
 
