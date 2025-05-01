@@ -63,22 +63,26 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-[#2c2c2e]" id="features">
+    <section
+      className="py-32 bg-gradient-to-b from-[#2c2c2e] to-[#23232a]"
+      id="features"
+    >
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center bg-[#3b82f6]/10 px-4 py-2 rounded-full mb-4 border border-[#3b82f6]/20">
-            <span className="text-sm text-white">Powerful Features</span>
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center bg-[#3b82f6]/10 px-5 py-2 rounded-full mb-6 border border-[#3b82f6]/20 shadow">
+            <span className="text-base text-white font-semibold tracking-wide">
+              Powerful Features
+            </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 drop-shadow-lg">
             Everything You Need for Secure File Management
           </h2>
-          <p className="text-white/70 max-w-2xl mx-auto">
+          <p className="text-white/70 max-w-3xl mx-auto text-lg font-medium">
             ZenVault combines powerful features with an intuitive interface to
             give you complete control over your digital assets.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {features.map((feature, index) => (
             <FeatureCard
               key={index}
