@@ -5,13 +5,9 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import supabase from "@/utils/supabase";
 import { api } from "@/utils/api";
 
 type AuthContextType = {
-  session: Session | null;
-  user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (
@@ -25,43 +21,17 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    setLoading(false);
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      // First try to authenticate with our backend
       await api.auth.login({ email, password });
 
-      // Then use Supabase for client-side session
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      return { error };
+      return { error: null };
     } catch (error: any) {
       return { error };
     }
@@ -69,12 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, name?: string) => {
     try {
-      // Register with our backend
       await api.auth.register({ email, password, name });
 
-      // Then use Supabase for client-side session
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      return { error, user: data.user };
+      return { error: null, user: null };
     } catch (error: any) {
       return { error, user: null };
     }
@@ -82,20 +49,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      // Logout from our backend
       await api.auth.logout();
 
-      // Then clear client-side session
-      const { error } = await supabase.auth.signOut();
-      return { error };
+      return { error: null };
     } catch (error: any) {
       return { error };
     }
   };
 
   const value = {
-    session,
-    user,
     loading,
     signIn,
     signUp,
