@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, RequestHandler } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
@@ -7,7 +7,7 @@ const router = Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT || "supersecret";
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", (async (req, res) => {
   const { email, password, name } = req.body;
   if (!email || !password)
     return res.status(400).json({ error: "Email and password required" });
@@ -25,9 +25,9 @@ router.post("/signup", async (req, res) => {
     token,
     user: { id: user.id, email: user.email, name: user.name },
   });
-});
+}) as RequestHandler);
 
-router.post("/login", async (req, res) => {
+router.post("/login", (async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
     return res.status(400).json({ error: "Email and password required" });
@@ -43,6 +43,6 @@ router.post("/login", async (req, res) => {
     token,
     user: { id: user.id, email: user.email, name: user.name },
   });
-});
+}) as RequestHandler);
 
 export default router;
