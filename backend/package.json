@@ -1,40 +1,23 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "prisma": "prisma"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.11.0",
+  "description": "",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.817.0",
-    "@prisma/client": "^6.8.2",
     "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.0",
     "pg": "^8.16.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/cookie-parser": "^1.4.8",
-    "@types/cors": "^2.8.18",
-    "@types/express": "^5.0.2",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.15.21",
-    "nodemon": "^3.1.10",
-    "prisma": "^6.8.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "nodemon": "^3.1.10"
   }
 }
