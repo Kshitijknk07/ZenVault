@@ -39,3 +39,6 @@ pids
 
 # Optional: macOS system files
 *.DS_Store
+
+# terraform
+.terraform/
