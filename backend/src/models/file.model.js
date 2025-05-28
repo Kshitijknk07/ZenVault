@@ -32,9 +32,34 @@ async function renameFileById(userId, fileId, newName) {
   return res.rows[0];
 }
 
+async function moveFile(userId, fileId, newFolderId) {
+  const res = await pool.query(
+    "UPDATE files SET folder_id = $1 WHERE id = $2 AND user_id = $3 RETURNING *",
+    [newFolderId, fileId, userId]
+  );
+  return res.rows[0];
+}
+
+async function copyFile(userId, fileId, newFolderId) {
+  const fileRes = await pool.query(
+    "SELECT * FROM files WHERE id = $1 AND user_id = $2",
+    [fileId, userId]
+  );
+  const file = fileRes.rows[0];
+  if (!file) return null;
+
+  const res = await pool.query(
+    "INSERT INTO files (user_id, file_name, s3_key, file_size, folder_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+    [userId, file.file_name, file.s3_key, file.file_size, newFolderId]
+  );
+  return res.rows[0];
+}
+
 module.exports = {
   addFile,
   listFilesByUser,
   deleteFileById,
   renameFileById,
+  moveFile,
+  copyFile,
 };

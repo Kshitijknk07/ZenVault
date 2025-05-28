@@ -32,3 +32,25 @@ exports.deleteFolder = async (req, res) => {
   if (!folder) return res.status(404).json({ message: "Folder not found" });
   res.json({ message: "Folder deleted" });
 };
+
+exports.moveFolder = async (req, res) => {
+  const userId = req.user.id;
+  const folderId = req.params.id;
+  const { newParentId } = req.body;
+  if (!newParentId)
+    return res.status(400).json({ message: "newParentId required" });
+  const folder = await folderModel.moveFolder(userId, folderId, newParentId);
+  if (!folder) return res.status(404).json({ message: "Folder not found" });
+  res.json({ folder });
+};
+
+exports.copyFolder = async (req, res) => {
+  const userId = req.user.id;
+  const folderId = req.params.id;
+  const { newParentId } = req.body;
+  if (!newParentId)
+    return res.status(400).json({ message: "newParentId required" });
+  const folder = await folderModel.copyFolder(userId, folderId, newParentId);
+  if (!folder) return res.status(404).json({ message: "Folder not found" });
+  res.json({ folder });
+};

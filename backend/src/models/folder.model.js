@@ -32,9 +32,34 @@ async function deleteFolder(userId, folderId) {
   return res.rows[0];
 }
 
+async function moveFolder(userId, folderId, newParentId) {
+  const res = await pool.query(
+    "UPDATE folders SET parent_id = $1 WHERE id = $2 AND user_id = $3 RETURNING *",
+    [newParentId, folderId, userId]
+  );
+  return res.rows[0];
+}
+
+async function copyFolder(userId, folderId, newParentId) {
+  const folderRes = await pool.query(
+    "SELECT * FROM folders WHERE id = $1 AND user_id = $2",
+    [folderId, userId]
+  );
+  const folder = folderRes.rows[0];
+  if (!folder) return null;
+
+  const res = await pool.query(
+    "INSERT INTO folders (user_id, name, parent_id) VALUES ($1, $2, $3) RETURNING *",
+    [userId, folder.name, newParentId]
+  );
+  return res.rows[0];
+}
+
 module.exports = {
   createFolder,
   listFoldersByUser,
   renameFolder,
   deleteFolder,
+  moveFolder,
+  copyFolder,
 };

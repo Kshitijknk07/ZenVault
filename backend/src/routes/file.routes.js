@@ -40,4 +40,10 @@ router.post("/download-url", authenticateToken, async (req, res) => {
   }
 });
 
+// Move a file
+router.post("/:id/move", authenticateToken, fileController.moveFile);
+
+// Copy a file
+router.post("/:id/copy", authenticateToken, fileController.copyFile);
+
 module.exports = router;
