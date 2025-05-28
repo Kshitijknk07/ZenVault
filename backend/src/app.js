@@ -15,9 +15,6 @@ app.use("/api/folders", folderRoutes);
 app.post("/api/files", (req, res) => {
   const { fileName, s3Key, fileSize, folderId } = req.body;
 
-  // Pass folderId to addFile and store it in the DB
-  // Your logic to save file metadata and folder association in the database
-
   res.status(201).send({ message: "File metadata saved successfully" });
 });
 
