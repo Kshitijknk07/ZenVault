@@ -13,6 +13,12 @@ const {
   verifyUser,
 } = require("../models/user.model");
 const { sendResetEmail, sendVerificationEmail } = require("../utils/email");
+const { blacklistToken } = require("../utils/tokenBlacklist");
+const {
+  addRefreshToken,
+  removeRefreshToken,
+  hasRefreshToken,
+} = require("../utils/refreshTokens");
 
 const JWT_EXPIRY = "1h";
 
@@ -76,7 +82,45 @@ exports.login = async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: JWT_EXPIRY }
   );
-  res.json({ token });
+  const refreshToken = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+  await addRefreshToken(refreshToken, 7 * 24 * 60 * 60); // 7 days
+  res.json({ token, refreshToken });
+};
+
+exports.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken || !(await hasRefreshToken(refreshToken))) {
+    return res.status(401).json({ message: "Invalid refresh token" });
+  }
+  try {
+    const user = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const newToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+    res.json({ token: newToken });
+  } catch {
+    res.status(401).json({ message: "Invalid refresh token" });
+  }
+};
+
+exports.logout = async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  const { refreshToken } = req.body;
+  if (token) {
+    // Blacklist for the remaining token lifetime (e.g., 1 hour)
+    await blacklistToken(token, 60 * 60);
+  }
+  if (refreshToken) {
+    await removeRefreshToken(refreshToken);
+  }
+  res.json({ message: "Logged out successfully" });
 };
 
 exports.profile = async (req, res) => {
