@@ -14,23 +14,23 @@ const { sendResetEmail } = require("../utils/email");
 const JWT_EXPIRY = "1h";
 
 exports.register = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password)
-    return res.status(400).json({ message: "Email and password required" });
+  const { email, password, username } = req.body;
+  if (!email || !password || !username)
+    return res
+      .status(400)
+      .json({ message: "Email, username, and password required" });
 
   const existingUser = await findUserByEmail(email);
   if (existingUser)
     return res.status(409).json({ message: "Email already registered" });
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await createUser(email, hashedPassword);
+  const user = await createUser(email, hashedPassword, username);
 
-  res
-    .status(201)
-    .json({
-      message: "User registered",
-      user: { id: user.id, email: user.email },
-    });
+  res.status(201).json({
+    message: "User registered",
+    user: { id: user.id, email: user.email, username: user.username },
+  });
 };
 
 exports.login = async (req, res) => {

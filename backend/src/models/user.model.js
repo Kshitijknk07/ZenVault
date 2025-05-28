@@ -5,10 +5,10 @@ async function findUserByEmail(email) {
   return res.rows[0];
 }
 
-async function createUser(email, hashedPassword) {
+async function createUser(email, hashedPassword, username) {
   const res = await pool.query(
-    "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
-    [email, hashedPassword]
+    "INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING *",
+    [email, hashedPassword, username]
   );
   return res.rows[0];
 }
