@@ -42,6 +42,28 @@ async function clearResetToken(email) {
   );
 }
 
+async function setVerificationToken(email, token) {
+  await pool.query(
+    "UPDATE users SET verification_token = $1 WHERE email = $2",
+    [token, email]
+  );
+}
+
+async function findUserByVerificationToken(token) {
+  const res = await pool.query(
+    "SELECT * FROM users WHERE verification_token = $1",
+    [token]
+  );
+  return res.rows[0];
+}
+
+async function verifyUser(email) {
+  await pool.query(
+    "UPDATE users SET is_verified = TRUE, verification_token = NULL WHERE email = $1",
+    [email]
+  );
+}
+
 module.exports = {
   findUserByEmail,
   createUser,
@@ -49,4 +71,7 @@ module.exports = {
   setResetToken,
   findUserByResetToken,
   clearResetToken,
+  setVerificationToken,
+  findUserByVerificationToken,
+  verifyUser,
 };

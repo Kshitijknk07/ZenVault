@@ -22,4 +22,7 @@ router.post("/forgot-password", auth.forgotPassword);
 // Reset password
 router.post("/reset-password/:token", auth.resetPassword);
 
+// Email verification
+router.get("/verify-email", auth.verifyEmail);
+
 module.exports = router;

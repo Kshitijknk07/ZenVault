@@ -8,8 +8,11 @@ const {
   setResetToken,
   findUserByResetToken,
   clearResetToken,
+  setVerificationToken,
+  findUserByVerificationToken,
+  verifyUser,
 } = require("../models/user.model");
-const { sendResetEmail } = require("../utils/email");
+const { sendResetEmail, sendVerificationEmail } = require("../utils/email");
 
 const JWT_EXPIRY = "1h";
 
@@ -27,16 +30,43 @@ exports.register = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = await createUser(email, hashedPassword, username);
 
+  // Generate verification token
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+  await setVerificationToken(email, verificationToken);
+
+  // Send verification email
+  const verificationLink = `${req.protocol}://${req.get(
+    "host"
+  )}/api/auth/verify-email?token=${verificationToken}`;
+  await sendVerificationEmail(email, verificationLink);
+
   res.status(201).json({
-    message: "User registered",
+    message: "User registered. Please verify your email.",
     user: { id: user.id, email: user.email, username: user.username },
   });
+};
+
+exports.verifyEmail = async (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).json({ message: "Token required" });
+
+  const user = await findUserByVerificationToken(token);
+  if (!user) return res.status(400).json({ message: "Invalid token" });
+
+  await verifyUser(user.email);
+
+  res.json({ message: "Email verified successfully. You can now log in." });
 };
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await findUserByEmail(email);
   if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+  if (!user.is_verified)
+    return res
+      .status(403)
+      .json({ message: "Please verify your email before logging in." });
 
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.status(401).json({ message: "Invalid credentials" });
