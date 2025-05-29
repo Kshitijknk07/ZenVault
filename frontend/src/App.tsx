@@ -1,33 +1,40 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { useState, useEffect } from "react";
 import AuthPage from "./authPage/Auth_Page";
-import LandingPage from "./landingPage/Landing_Page";
-import Dashboard from "./components/Dashboard";
 import VerificationPage from "./authPage/VerificationPage";
-import { useEffect, useState } from "react";
+import ForgotPassword from "./authPage/ForgotPassword";
+import ResetPassword from "./authPage/ResetPassword";
+import Dashboard from "./components/Dashboard";
+import LandingPage from "./landingPage/Landing_Page";
 import { getProfile } from "./api/auth";
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+// Protected Route Component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (token) {
+        try {
+          await getProfile();
+          setIsAuthenticated(true);
+        } catch (error) {
+          localStorage.removeItem("token");
+          setIsAuthenticated(false);
+        }
+      } else {
         setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
       }
-
-      try {
-        await getProfile();
-        setIsAuthenticated(true);
-      } catch {
-        setIsAuthenticated(false);
-        localStorage.removeItem("token");
-      } finally {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     };
 
     checkAuth();
@@ -35,45 +42,119 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Public Route Component
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          await getProfile();
+          setIsAuthenticated(true);
+        } catch (error) {
+          localStorage.removeItem("token");
+          setIsAuthenticated(false);
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        {/* Public Routes */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          }
+        />
         <Route
           path="/auth"
           element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
+            <PublicRoute>
               <AuthPage />
-            )
+            </PublicRoute>
           }
         />
         <Route
           path="/verify"
           element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
+            <PublicRoute>
               <VerificationPage />
-            )
+            </PublicRoute>
           }
         />
         <Route
-          path="/dashboard"
+          path="/forgot-password"
           element={
-            isAuthenticated ? <Dashboard /> : <Navigate to="/auth" replace />
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
           }
         />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard/*"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback Route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 

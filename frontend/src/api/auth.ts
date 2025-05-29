@@ -13,6 +13,10 @@ interface LoginData {
   password: string;
 }
 
+interface ResetPasswordData {
+  password: string;
+}
+
 export const registerUser = async (data: RegisterData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, data);
@@ -53,6 +57,45 @@ export const loginUser = async (data: LoginData) => {
     throw new Error(
       "Login failed. Please check your credentials and try again."
     );
+  }
+};
+
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
+      email,
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    if (error.code === "ECONNREFUSED") {
+      throw new Error(
+        "Unable to connect to the server. Please try again later."
+      );
+    }
+    throw new Error("Failed to send reset email. Please try again later.");
+  }
+};
+
+export const resetPassword = async (token: string, data: ResetPasswordData) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/auth/reset-password/${token}`,
+      data
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    if (error.code === "ECONNREFUSED") {
+      throw new Error(
+        "Unable to connect to the server. Please try again later."
+      );
+    }
+    throw new Error("Failed to reset password. Please try again later.");
   }
 };
 

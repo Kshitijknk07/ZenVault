@@ -21,6 +21,8 @@ const AuthPage = () => {
       if (isLogin) {
         const response = await loginUser({ email, password });
         localStorage.setItem("token", response.token);
+        // Dispatch a storage event to trigger auth state update
+        window.dispatchEvent(new Event("storage"));
         navigate("/dashboard", { replace: true });
       } else {
         const username = formData.get("username") as string;
@@ -150,9 +152,20 @@ const AuthPage = () => {
               ) : isLogin ? (
                 "Sign In"
               ) : (
-                "Create Account"
+                "Sign Up"
               )}
             </button>
+
+            {isLogin && (
+              <div className="text-center mt-4">
+                <Link
+                  to="/forgot-password"
+                  className="text-slate-400 hover:text-emerald-400 transition-colors duration-200 text-sm"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+            )}
           </form>
 
           <div className="mt-6 text-center">
