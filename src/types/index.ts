@@ -70,3 +70,177 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+// File Management Types
+
+export interface Folder {
+  id: string;
+  name: string;
+  description?: string;
+  parentFolderId?: string;
+  ownerId: string;
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  parentFolder?: Folder;
+  subFolders?: Folder[];
+  files?: File[];
+  owner?: User;
+}
+
+export interface File {
+  id: string;
+  name: string;
+  originalName: string;
+  description?: string;
+  mimeType: string;
+  size: number;
+  filePath: string;
+  folderId?: string;
+  ownerId: string;
+  isPublic: boolean;
+  isDeleted: boolean;
+  deletedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  folder?: Folder;
+  owner?: User;
+  versions?: FileVersion[];
+  tags?: FileTag[];
+  currentVersion?: FileVersion;
+}
+
+export interface FileVersion {
+  id: string;
+  fileId: string;
+  versionNumber: number;
+  filePath: string;
+  size: number;
+  mimeType: string;
+  checksum: string;
+  uploadedBy: string;
+  createdAt: Date;
+  file?: File;
+  uploadedByUser?: User;
+}
+
+export interface FileShare {
+  id: string;
+  resourceType: "file" | "folder";
+  resourceId: string;
+  sharedBy: string;
+  sharedWith?: string;
+  shareToken?: string;
+  permission: "read" | "write" | "admin";
+  expiresAt?: Date;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  sharedByUser?: User;
+  sharedWithUser?: User;
+  resource?: File | Folder;
+}
+
+export interface FileTag {
+  id: string;
+  name: string;
+  color: string;
+  createdBy: string;
+  createdAt: Date;
+  createdByUser?: User;
+}
+
+export interface FileAccessLog {
+  id: string;
+  userId?: string;
+  resourceType: "file" | "folder";
+  resourceId: string;
+  action: "view" | "download" | "upload" | "edit" | "delete" | "share";
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
+  user?: User;
+}
+
+// File Management Request/Response Types
+
+export interface CreateFolderRequest {
+  name: string;
+  description?: string;
+  parentFolderId?: string;
+  isPublic?: boolean;
+}
+
+export interface UpdateFolderRequest {
+  name?: string;
+  description?: string;
+  isPublic?: boolean;
+}
+
+export interface UploadFileRequest {
+  folderId?: string;
+  description?: string;
+  isPublic?: boolean;
+  tags?: string[];
+}
+
+export interface UpdateFileRequest {
+  name?: string;
+  description?: string;
+  isPublic?: boolean;
+  tags?: string[];
+}
+
+export interface ShareResourceRequest {
+  resourceType: "file" | "folder";
+  resourceId: string;
+  sharedWith?: string;
+  shareToken?: string;
+  permission?: "read" | "write" | "admin";
+  expiresAt?: Date;
+}
+
+export interface CreateTagRequest {
+  name: string;
+  color?: string;
+}
+
+export interface FileSearchParams extends PaginationParams {
+  query?: string;
+  mimeType?: string;
+  minSize?: number;
+  maxSize?: number;
+  tags?: string[];
+  isPublic?: boolean;
+  folderId?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
+export interface FolderSearchParams extends PaginationParams {
+  query?: string;
+  isPublic?: boolean;
+  parentFolderId?: string;
+}
+
+export interface FileUploadResponse {
+  file: File;
+  version: FileVersion;
+  uploadUrl?: string;
+}
+
+export interface FileDownloadResponse {
+  file: File;
+  downloadUrl: string;
+  expiresAt: Date;
+}
+
+export interface FileStats {
+  totalFiles: number;
+  totalSize: number;
+  totalFolders: number;
+  filesByType: Record<string, number>;
+  recentUploads: File[];
+  storageUsed: number;
+  storageLimit: number;
+}

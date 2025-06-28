@@ -4,22 +4,17 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-
-// Import configurations and services
 import DatabaseManager from "@/config/database";
 import logger from "@/config/logger";
-
-// Import routes
 import authRoutes from "@/routes/auth";
+import fileRoutes from "@/routes/files";
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env["PORT"] || 3000;
 const API_VERSION = process.env["API_VERSION"] || "v1";
 
-// Security middleware
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -33,7 +28,6 @@ app.use(
   })
 );
 
-// CORS configuration
 app.use(
   cors({
     origin:
@@ -46,7 +40,6 @@ app.use(
   })
 );
 
-// Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env["RATE_LIMIT_WINDOW_MS"] || "900000"),
   max: parseInt(process.env["RATE_LIMIT_MAX_REQUESTS"] || "100"),
@@ -60,12 +53,9 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
-
-// Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Logging middleware
 if (process.env["NODE_ENV"] === "development") {
   app.use(morgan("dev"));
 } else {
@@ -78,7 +68,6 @@ if (process.env["NODE_ENV"] === "development") {
   );
 }
 
-// Health check endpoint
 app.get("/health", (_, res) => {
   res.status(200).json({
     success: true,
@@ -89,10 +78,9 @@ app.get("/health", (_, res) => {
   });
 });
 
-// API routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
+app.use(`/api/${API_VERSION}/files`, fileRoutes);
 
-// 404 handler
 app.use("*", (req, res) => {
   res.status(404).json({
     success: false,
@@ -101,7 +89,6 @@ app.use("*", (req, res) => {
   });
 });
 
-// Global error handler
 app.use((error: any, res: express.Response) => {
   logger.error("Unhandled error:", error);
 
@@ -121,7 +108,6 @@ app.use((error: any, res: express.Response) => {
   });
 });
 
-// Graceful shutdown handling
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Rejection at:", promise, "reason:", reason);
   process.exit(1);
@@ -132,14 +118,11 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
-// Start server
 async function startServer() {
   try {
-    // Connect to database
     await DatabaseManager.connect();
     logger.info("Database connected successfully");
 
-    // Start Express server
     app.listen(PORT, () => {
       logger.info(`🚀 ZenVault API server running on port ${PORT}`);
       logger.info(

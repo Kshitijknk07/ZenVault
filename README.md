@@ -1,31 +1,35 @@
 # ZenVault
 
-A personal file storage system built with Node.js, Express, TypeScript, PostgreSQL, and Redis. This project aims to provide Google Drive-like functionality with secure authentication and file management capabilities.
+A secure personal file storage and management system built with Node.js, Express, TypeScript, PostgreSQL, and Redis. ZenVault provides comprehensive file organization, versioning, and access control for personal and professional use.
 
 ## Overview
 
-ZenVault is a work-in-progress personal project that will eventually include comprehensive file storage, sharing, and management features. Currently, the authentication system is implemented as the foundation for future development.
+ZenVault is a robust file storage solution that offers secure authentication, advanced file management, and comprehensive organization features. The system is designed for users who need reliable, secure, and organized file storage with version control and detailed access management.
 
-## Current Features
+## Features
 
-### Authentication System
-- User registration and login
-- JWT-based authentication with refresh tokens
+### Authentication & Security
+- Secure user registration and login with JWT tokens
 - Role-based access control (User, Moderator, Admin)
-- Password reset functionality
-- Email verification (ready for implementation)
+- Password reset and email verification capabilities
 - Session management with Redis
-- Secure password hashing with bcrypt
+- Advanced security with Helmet.js, CORS, and rate limiting
 
-### Security Features
-- Helmet.js for security headers
-- CORS configuration
-- Rate limiting
-- Input validation with Joi
-- SQL injection prevention
-- XSS protection
-- Environment variable validation
-- Secure Docker configuration
+### File Management
+- **Upload & Download**: Secure file handling with size validation and type checking
+- **Organization**: Hierarchical folder structure with unlimited nesting
+- **Versioning**: Automatic file versioning with rollback capabilities
+- **Metadata**: Rich file metadata including descriptions, tags, and custom properties
+- **Search**: Advanced search with filters for type, size, date, and tags
+- **Statistics**: Comprehensive storage analytics and usage tracking
+- **Access Control**: Granular permissions and public/private file settings
+
+### Advanced Capabilities
+- **File Operations**: Move, copy, rename, and organize files efficiently
+- **Bulk Operations**: Support for multiple file operations
+- **Storage Management**: Soft delete, permanent delete, and storage optimization
+- **API Integration**: RESTful API for seamless integration with other systems
+- **Scalable Architecture**: Built for performance and scalability
 
 ## Tech Stack
 
@@ -38,86 +42,58 @@ ZenVault is a work-in-progress personal project that will eventually include com
 - **Security**: Helmet, CORS, Rate Limiting
 - **Containerization**: Docker & Docker Compose
 
-## Prerequisites
+## Quick Start
 
+### Prerequisites
 - Node.js 18+
 - Docker & Docker Compose
 - Git
 
-## Quick Start
+### Installation
 
-### 1. Clone the Repository
+1. **Clone the Repository**
 ```bash
 git clone <repository-url>
 cd ZenVault
 ```
 
-### 2. Install Dependencies
+2. **Install Dependencies**
 ```bash
 npm install
 ```
 
-### 3. Set Up Environment Variables
+3. **Configure Environment**
 ```bash
 cp env.example .env
 ```
 
-Edit `.env` file and set secure values:
+Edit `.env` with your configuration:
 ```env
-# Generate strong JWT secrets (REQUIRED)
+# Required: Generate strong JWT secrets
 JWT_SECRET=your-64-character-strong-jwt-secret-here
 JWT_REFRESH_SECRET=your-64-character-strong-refresh-jwt-secret-here
 
-# Set secure database password
+# Database configuration
 DB_PASSWORD=your_secure_database_password_here
 
-# Other configurations...
+# Application settings
 NODE_ENV=development
 PORT=3000
 API_VERSION=v1
-DB_HOST=localhost
-DB_PORT=5433
-DB_NAME=zenvault
-DB_USER=zenvault_user
-REDIS_HOST=localhost
-REDIS_PORT=6380
 ```
 
-### 4. Start Database Services
+4. **Start Services**
 ```bash
 docker compose up -d
 ```
 
-### 5. Build and Start the Application
+5. **Build and Run**
 ```bash
-# Build TypeScript
 npm run build
-
-# Start in development mode
 npm run dev
-
-# Or start in production mode
-npm start
 ```
 
 The API will be available at `http://localhost:3000`
-
-## Security Configuration
-
-### JWT Secrets
-Generate strong JWT secrets using:
-```bash
-# Generate 64-character random string
-openssl rand -base64 48
-
-# Or use Node.js
-node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
-```
-
-### Environment Variables
-- All sensitive data is stored in environment variables
-- `.env` files are excluded from Docker builds via `.dockerignore`
-- JWT secrets are required and validated at startup
 
 ## API Documentation
 
@@ -164,84 +140,115 @@ Content-Type: application/json
 }
 ```
 
-#### Get Profile
+### File Management Endpoints
+
+#### Upload File
 ```http
-GET /auth/profile
+POST /files/upload
+Authorization: Bearer your-access-token
+Content-Type: multipart/form-data
+
+file: [file]
+folderId: "optional-folder-id"
+description: "File description"
+isPublic: "false"
+tags: "tag1,tag2,tag3"
+```
+
+#### Download File
+```http
+GET /files/{fileId}/download
 Authorization: Bearer your-access-token
 ```
 
-#### Update Profile
+#### Download Specific Version
 ```http
-PUT /auth/profile
+GET /files/{fileId}/download?version=2
 Authorization: Bearer your-access-token
-Content-Type: application/json
-
-{
-  "firstName": "John",
-  "lastName": "Smith",
-  "username": "newusername"
-}
 ```
 
-#### Change Password
+#### Get File Info
 ```http
-PUT /auth/change-password
+GET /files/{fileId}
 Authorization: Bearer your-access-token
-Content-Type: application/json
-
-{
-  "currentPassword": "OldPass123!",
-  "newPassword": "NewPass123!",
-  "confirmNewPassword": "NewPass123!"
-}
 ```
 
-#### Forgot Password
+#### Update File
 ```http
-POST /auth/forgot-password
-Content-Type: application/json
-
-{
-  "email": "user@example.com"
-}
-```
-
-#### Reset Password
-```http
-POST /auth/reset-password
-Content-Type: application/json
-
-{
-  "resetToken": "reset-token-from-email",
-  "newPassword": "NewPass123!",
-  "confirmNewPassword": "NewPass123!"
-}
-```
-
-#### Logout
-```http
-POST /auth/logout
+PUT /files/{fileId}
 Authorization: Bearer your-access-token
 Content-Type: application/json
 
 {
-  "refreshToken": "your-refresh-token"
+  "name": "New File Name",
+  "description": "Updated description",
+  "isPublic": true,
+  "tags": "newtag1,newtag2"
 }
 ```
 
-#### Verify Token
+#### Search Files
 ```http
-GET /auth/verify-token
+GET /files?query=document&mimeType=application/pdf&minSize=1000&maxSize=1000000&page=1&limit=10
 Authorization: Bearer your-access-token
 ```
 
-### Health Check
+#### Get File Statistics
 ```http
-GET /health
+GET /files/stats/overview
+Authorization: Bearer your-access-token
 ```
 
-## Scripts
+#### Get File Versions
+```http
+GET /files/{fileId}/versions
+Authorization: Bearer your-access-token
+```
 
+### Folder Management Endpoints
+
+#### Create Folder
+```http
+POST /files/folders
+Authorization: Bearer your-access-token
+Content-Type: application/json
+
+{
+  "name": "My Documents",
+  "description": "Important documents folder",
+  "parentFolderId": "optional-parent-folder-id",
+  "isPublic": false
+}
+```
+
+#### Get Folder
+```http
+GET /files/folders/{folderId}
+Authorization: Bearer your-access-token
+```
+
+#### Update Folder
+```http
+PUT /files/folders/{folderId}
+Authorization: Bearer your-access-token
+Content-Type: application/json
+
+{
+  "name": "Updated Folder Name",
+  "description": "Updated description",
+  "isPublic": true
+}
+```
+
+#### Search Folders
+```http
+GET /files/folders?query=documents&isPublic=false&page=1&limit=10
+Authorization: Bearer your-access-token
+```
+
+## Development
+
+### Available Scripts
 ```bash
 # Development
 npm run dev          # Start development server with hot reload
@@ -255,58 +262,36 @@ npm run format      # Format code with Prettier
 
 # Database
 npm run db:migrate  # Run database migrations
-npm run db:seed     # Seed database with sample data
-
-# Testing
-npm test            # Run tests
-npm run test:watch  # Run tests in watch mode
 ```
 
-## Docker
-
-### Development
-```bash
-# Start only database services
-docker compose up -d
-
-# Start application (after installing dependencies)
-npm run dev
-```
-
-## Project Structure
-
+### Project Structure
 ```
 ZenVault/
 ├── src/
 │   ├── config/           # Configuration files
-│   │   ├── database.ts   # Database configuration
-│   │   └── logger.ts     # Winston logger setup
 │   ├── controllers/      # Route controllers
-│   │   └── AuthController.ts
 │   ├── middleware/       # Express middleware
-│   │   ├── auth.ts       # Authentication middleware
-│   │   └── validation.ts # Request validation
 │   ├── models/           # Database models
-│   │   └── User.ts       # User model
 │   ├── routes/           # API routes
-│   │   └── auth.ts       # Authentication routes
 │   ├── services/         # Business logic
-│   │   └── AuthService.ts
 │   ├── types/            # TypeScript type definitions
-│   │   └── index.ts
 │   └── index.ts          # Application entry point
 ├── database/
 │   └── init/             # Database initialization scripts
-│       └── 01_create_users_table.sql
-├── logs/                 # Application logs
-├── dist/                 # Compiled JavaScript
 ├── docker-compose.yml    # Docker services
-├── .dockerignore         # Docker ignore file
-├── .env.example          # Environment variables template
-├── package.json
-├── tsconfig.json
 └── README.md
 ```
+
+## Security Features
+
+- **Password Security**: Strong password requirements with bcrypt hashing
+- **JWT Authentication**: Secure token-based authentication with refresh tokens
+- **Rate Limiting**: Protection against brute force attacks
+- **Input Validation**: Comprehensive validation with Joi schemas
+- **SQL Injection Protection**: Parameterized queries throughout
+- **XSS Protection**: Security headers with Helmet.js
+- **CORS Configuration**: Controlled cross-origin access
+- **Environment Security**: Sensitive data isolated in environment variables
 
 ## Configuration
 
@@ -324,56 +309,29 @@ ZenVault/
 | `DB_PASSWORD` | Database password | **Yes** | - |
 | `REDIS_HOST` | Redis host | No | `localhost` |
 | `REDIS_PORT` | Redis port | No | `6380` |
-| `REDIS_PASSWORD` | Redis password | No | - |
 | `JWT_SECRET` | JWT secret key | **Yes** | - |
-| `JWT_EXPIRES_IN` | JWT expiration | No | `7d` |
 | `JWT_REFRESH_SECRET` | Refresh token secret | **Yes** | - |
-| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiration | No | `30d` |
 | `BCRYPT_ROUNDS` | Password hashing rounds | No | `12` |
-| `RATE_LIMIT_WINDOW_MS` | Rate limit window | No | `900000` (15 min) |
-| `RATE_LIMIT_MAX_REQUESTS` | Max requests per window | No | `100` |
 
-## Security Features
+## Current Status
 
-- Password Requirements: Minimum 8 characters with uppercase, lowercase, number, and special character
-- JWT Security: Separate secrets for access and refresh tokens (required)
-- Rate Limiting: Prevents brute force attacks
-- Input Validation: All inputs validated with Joi schemas
-- SQL Injection Protection: Parameterized queries
-- XSS Protection: Helmet.js security headers
-- CORS Configuration: Restricts cross-origin requests
-- Environment Variable Validation: Required secrets validated at startup
-- Docker Security: Sensitive files excluded from Docker builds
+ZenVault is a fully functional file storage system with the following completed features:
 
-## Planned Features
+**✅ Completed:**
+- User authentication and authorization
+- File upload/download with validation
+- Folder organization system
+- File versioning and management
+- Advanced search and filtering
+- Access control and permissions
+- File statistics and storage tracking
+- Comprehensive API documentation
 
-This authentication system serves as the foundation for future development. Planned features include:
-
-1. **File Management System**
-   - File upload/download
-   - Folder organization
-   - File metadata
-
-2. **Sharing & Permissions**
-   - File sharing
-   - Permission management
-   - Public/private links
-
-3. **Advanced Features**
-   - File preview
-   - Version control
-   - Search functionality
-   - Real-time collaboration
-
-4. **Frontend Application**
-   - React/Vue.js frontend
-   - File browser interface
-   - User dashboard
-
-## Development Status
-
-This is a personal project in active development. The authentication system is complete and functional, providing a solid foundation for the planned file management features.
+**🔄 In Development:**
+- File sharing and collaboration features
+- Advanced search capabilities
+- Frontend application
 
 ---
 
-**ZenVault** - Personal file storage system 
+**ZenVault** - Secure personal file storage and management system 

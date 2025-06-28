@@ -3,7 +3,6 @@ import AuthService from "@/services/AuthService";
 import { UserRole } from "@/types";
 import logger from "@/config/logger";
 
-// Extend Express Request interface to include user
 declare global {
   namespace Express {
     interface Request {
@@ -32,7 +31,7 @@ export const authenticate = async (
       return;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7);
 
     try {
       const decoded = await AuthService.verifyToken(token);

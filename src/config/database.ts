@@ -2,26 +2,23 @@ import { Pool, PoolConfig } from "pg";
 import { createClient, RedisClientOptions } from "redis";
 import logger from "./logger";
 
-// PostgreSQL Configuration
 const postgresConfig: PoolConfig = {
   host: process.env["DB_HOST"] || "localhost",
   port: parseInt(process.env["DB_PORT"] || "5432"),
   database: process.env["DB_NAME"] || "zenvault",
   user: process.env["DB_USER"] || "zenvault_user",
   password: process.env["DB_PASSWORD"] || "zenvault_password",
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
   ssl:
     process.env["NODE_ENV"] === "production"
       ? { rejectUnauthorized: false }
       : false,
 };
 
-// Create PostgreSQL connection pool
 export const postgresPool = new Pool(postgresConfig);
 
-// Redis Configuration
 const redisConfig: RedisClientOptions = {
   socket: {
     host: process.env["REDIS_HOST"] || "localhost",
@@ -30,10 +27,8 @@ const redisConfig: RedisClientOptions = {
   password: process.env["REDIS_PASSWORD"] || "",
 };
 
-// Create Redis client (let TypeScript infer the type)
 export const redisClient = createClient(redisConfig);
 
-// Database connection management
 export class DatabaseManager {
   private static instance: DatabaseManager;
   private isConnected = false;
@@ -49,13 +44,11 @@ export class DatabaseManager {
 
   public async connect(): Promise<void> {
     try {
-      // Test PostgreSQL connection
       const client = await postgresPool.connect();
       await client.query("SELECT NOW()");
       client.release();
       logger.info("PostgreSQL connected successfully");
 
-      // Test Redis connection
       await redisClient.connect();
       await redisClient.ping();
       logger.info("Redis connected successfully");
@@ -84,7 +77,6 @@ export class DatabaseManager {
   }
 }
 
-// Graceful shutdown handling
 process.on("SIGINT", async () => {
   logger.info("Received SIGINT, closing database connections...");
   await DatabaseManager.getInstance().disconnect();

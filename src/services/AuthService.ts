@@ -23,14 +23,14 @@ export class AuthService {
     // Require JWT secrets to be set in environment variables
     const jwtSecret = process.env["JWT_SECRET"];
     const jwtRefreshSecret = process.env["JWT_REFRESH_SECRET"];
-    
+
     if (!jwtSecret) {
       throw new Error("JWT_SECRET environment variable is required");
     }
     if (!jwtRefreshSecret) {
       throw new Error("JWT_REFRESH_SECRET environment variable is required");
     }
-    
+
     this.jwtSecret = jwtSecret;
     this.jwtExpiresIn = process.env["JWT_EXPIRES_IN"] || "7d";
     this.jwtRefreshSecret = jwtRefreshSecret;
