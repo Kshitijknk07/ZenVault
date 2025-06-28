@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: zenvault_postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-zenvault}
+      POSTGRES_USER: ${DB_USER:-zenvault_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-zenvault_password}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - zenvault_network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: zenvault_redis
+    ports:
+      - "${REDIS_PORT:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - zenvault_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  zenvault_network:
+    driver: bridge 
