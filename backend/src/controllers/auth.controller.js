@@ -1,162 +1,453 @@
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+const { validationResult } = require("express-validator");
+const userModel = require("../models/user.model");
+const refreshTokenModel = require("../models/refreshToken.model");
+const { blacklistToken } = require("../config/redis");
 const {
-  findUserByEmail,
-  createUser,
-  updateUserPassword,
-  setResetToken,
-  findUserByResetToken,
-  clearResetToken,
-  setVerificationToken,
-  findUserByVerificationToken,
-  verifyUser,
-} = require("../models/user.model");
-const { sendResetEmail, sendVerificationEmail } = require("../utils/email");
-const { blacklistToken } = require("../utils/tokenBlacklist");
-const {
-  addRefreshToken,
-  removeRefreshToken,
-  hasRefreshToken,
-} = require("../utils/refreshTokens");
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} = require("../utils/email");
 
-const JWT_EXPIRY = "1h";
+const generateTokens = (userId) => {
+  const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "15m",
+  });
 
-exports.register = async (req, res) => {
-  const { email, password, username } = req.body;
-  if (!email || !password || !username)
-    return res
-      .status(400)
-      .json({ message: "Email, username, and password required" });
+  const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
+  });
 
-  const existingUser = await findUserByEmail(email);
-  if (existingUser)
-    return res.status(409).json({ message: "Email already registered" });
+  return { accessToken, refreshToken };
+};
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await createUser(email, hashedPassword, username);
+const storeRefreshToken = async (userId, refreshToken) => {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
 
-  // Generate verification token
-  const verificationToken = crypto.randomBytes(32).toString("hex");
-  await setVerificationToken(email, verificationToken);
-
-  // Send verification email
-  const verificationLink = `${req.protocol}://${req.get(
-    "host"
-  )}/api/auth/verify-email?token=${verificationToken}`;
-  await sendVerificationEmail(email, verificationLink);
-
-  res.status(201).json({
-    message: "User registered. Please verify your email.",
-    user: { id: user.id, email: user.email, username: user.username },
+  await refreshTokenModel.storeRefreshToken({
+    userId,
+    token: refreshToken,
+    expiresAt,
   });
 };
 
-exports.verifyEmail = async (req, res) => {
-  const { token } = req.query;
-  if (!token) return res.status(400).json({ message: "Token required" });
-
-  const user = await findUserByVerificationToken(token);
-  if (!user) return res.status(400).json({ message: "Invalid token" });
-
-  await verifyUser(user.email);
-
-  res.json({ message: "Email verified successfully. You can now log in." });
-};
-
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await findUserByEmail(email);
-  if (!user) return res.status(401).json({ message: "Invalid credentials" });
-
-  if (!user.is_verified)
-    return res
-      .status(403)
-      .json({ message: "Please verify your email before logging in." });
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ message: "Invalid credentials" });
-
-  const token = jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: JWT_EXPIRY }
-  );
-  const refreshToken = jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-  await addRefreshToken(refreshToken, 7 * 24 * 60 * 60); // 7 days
-  res.json({ token, refreshToken });
-};
-
-exports.refreshToken = async (req, res) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken || !(await hasRefreshToken(refreshToken))) {
-    return res.status(401).json({ message: "Invalid refresh token" });
-  }
+const register = async (req, res) => {
   try {
-    const user = jwt.verify(refreshToken, process.env.JWT_SECRET);
-    const newToken = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: JWT_EXPIRY }
-    );
-    res.json({ token: newToken });
-  } catch {
-    res.status(401).json({ message: "Invalid refresh token" });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: "Validation failed",
+        message: "Please check your input",
+        details: errors.array(),
+      });
+    }
+
+    const { username, email, password } = req.body;
+
+    const existingUser = await userModel.findUserByEmail(email);
+    if (existingUser) {
+      return res.status(409).json({
+        error: "User already exists",
+        message: "A user with this email already exists",
+      });
+    }
+
+    const existingUsername = await userModel.findUserByUsername(username);
+    if (existingUsername) {
+      return res.status(409).json({
+        error: "Username taken",
+        message: "This username is already taken",
+      });
+    }
+
+    const { user, verificationToken } = await userModel.createUser({
+      username,
+      email,
+      password,
+    });
+
+    const { accessToken, refreshToken } = generateTokens(user.id);
+
+    await storeRefreshToken(user.id, refreshToken);
+
+    try {
+      await sendVerificationEmail(email, verificationToken, username);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+    }
+
+    res.status(201).json({
+      message:
+        "User registered successfully. Please check your email to verify your account.",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({
+      error: "Registration failed",
+      message: "Failed to create user account",
+    });
   }
 };
 
-exports.logout = async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  const { refreshToken } = req.body;
-  if (token) {
-    // Blacklist for the remaining token lifetime (e.g., 1 hour)
-    await blacklistToken(token, 60 * 60);
+const login = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: "Validation failed",
+        message: "Please check your input",
+        details: errors.array(),
+      });
+    }
+
+    const { email, password } = req.body;
+
+    const user = await userModel.findUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({
+        error: "Invalid credentials",
+        message: "Email or password is incorrect",
+      });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        error: "Invalid credentials",
+        message: "Email or password is incorrect",
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({
+        error: "Account not verified",
+        message: "Please verify your email address before logging in",
+      });
+    }
+
+    const { accessToken, refreshToken } = generateTokens(user._id);
+
+    await storeRefreshToken(user._id, refreshToken);
+
+    res.json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      error: "Login failed",
+      message: "Failed to authenticate user",
+    });
   }
-  if (refreshToken) {
-    await removeRefreshToken(refreshToken);
+};
+
+const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        error: "Refresh token required",
+        message: "Please provide a refresh token",
+      });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const tokenRecord = await refreshTokenModel.findRefreshToken(refreshToken);
+
+    if (!tokenRecord) {
+      return res.status(401).json({
+        error: "Invalid refresh token",
+        message: "Refresh token is invalid or expired",
+      });
+    }
+
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+      generateTokens(decoded.userId);
+
+    await refreshTokenModel.revokeRefreshToken(refreshToken);
+    await storeRefreshToken(decoded.userId, newRefreshToken);
+
+    res.json({
+      message: "Token refreshed successfully",
+      tokens: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+    });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        error: "Token expired",
+        message: "Refresh token has expired",
+      });
+    }
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        error: "Invalid token",
+        message: "Invalid refresh token",
+      });
+    }
+
+    console.error("Token refresh error:", error);
+    res.status(500).json({
+      error: "Token refresh failed",
+      message: "Failed to refresh token",
+    });
   }
-  res.json({ message: "Logged out successfully" });
 };
 
-exports.profile = async (req, res) => {
-  res.json({ id: req.user.id, email: req.user.email });
+const logout = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+      await blacklistToken(token);
+    }
+
+    const { refreshToken } = req.body;
+    if (refreshToken) {
+      await refreshTokenModel.revokeRefreshToken(refreshToken);
+    }
+
+    res.json({
+      message: "Logout successful",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({
+      error: "Logout failed",
+      message: "Failed to logout user",
+    });
+  }
 };
 
-exports.forgotPassword = async (req, res) => {
-  const { email } = req.body;
-  const user = await findUserByEmail(email);
-  if (!user)
-    return res
-      .status(200)
-      .json({ message: "If email exists, reset link sent" });
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
 
-  const token = crypto.randomBytes(32).toString("hex");
-  const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-  await setResetToken(email, token, expiry);
+    const user = await userModel.verifyUser(token);
+    if (!user) {
+      return res.status(400).json({
+        error: "Invalid token",
+        message: "Verification token is invalid or expired",
+      });
+    }
 
-  const resetLink = `${req.protocol}://${req.get(
-    "host"
-  )}/api/auth/reset-password/${token}`;
-  await sendResetEmail(email, resetLink);
-
-  res.json({ message: "If email exists, reset link sent" });
+    res.json({
+      message: "Email verified successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (error) {
+    console.error("Email verification error:", error);
+    res.status(500).json({
+      error: "Verification failed",
+      message: "Failed to verify email",
+    });
+  }
 };
 
-exports.resetPassword = async (req, res) => {
-  const { token } = req.params;
-  const { password } = req.body;
-  const user = await findUserByResetToken(token);
-  if (!user)
-    return res.status(400).json({ message: "Invalid or expired token" });
+const requestPasswordReset = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: "Validation failed",
+        message: "Please check your input",
+        details: errors.array(),
+      });
+    }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await updateUserPassword(user.email, hashedPassword);
-  await clearResetToken(user.email);
+    const { email } = req.body;
 
-  res.json({ message: "Password reset successful" });
+    const user = await userModel.setPasswordResetToken(email);
+    if (!user) {
+      return res.json({
+        message:
+          "If an account with that email exists, a password reset link has been sent",
+      });
+    }
+
+    try {
+      await sendPasswordResetEmail(
+        email,
+        user.resetPasswordToken,
+        user.username
+      );
+    } catch (emailError) {
+      console.error("Failed to send password reset email:", emailError);
+      return res.status(500).json({
+        error: "Email sending failed",
+        message: "Failed to send password reset email",
+      });
+    }
+
+    res.json({
+      message:
+        "If an account with that email exists, a password reset link has been sent",
+    });
+  } catch (error) {
+    console.error("Password reset request error:", error);
+    res.status(500).json({
+      error: "Password reset failed",
+      message: "Failed to process password reset request",
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: "Validation failed",
+        message: "Please check your input",
+        details: errors.array(),
+      });
+    }
+
+    const { token, newPassword } = req.body;
+
+    const user = await userModel.resetPassword(token, newPassword);
+    if (!user) {
+      return res.status(400).json({
+        error: "Invalid token",
+        message: "Password reset token is invalid or expired",
+      });
+    }
+
+    res.json({
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    console.error("Password reset error:", error);
+    res.status(500).json({
+      error: "Password reset failed",
+      message: "Failed to reset password",
+    });
+  }
+};
+
+const getProfile = async (req, res) => {
+  try {
+    const user = await userModel.findUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found",
+        message: "User profile not found",
+      });
+    }
+
+    const stats = await userModel.getUserStats(req.user.id);
+
+    res.json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+      stats,
+    });
+  } catch (error) {
+    console.error("Get profile error:", error);
+    res.status(500).json({
+      error: "Profile retrieval failed",
+      message: "Failed to get user profile",
+    });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: "Validation failed",
+        message: "Please check your input",
+        details: errors.array(),
+      });
+    }
+
+    const { username, email } = req.body;
+
+    const updatedUser = await userModel.updateProfile(req.user.id, {
+      username,
+      email,
+    });
+    if (!updatedUser) {
+      return res.status(404).json({
+        error: "User not found",
+        message: "User profile not found",
+      });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      user: {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        isVerified: updatedUser.isVerified,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    if (error.message.includes("already exists")) {
+      return res.status(409).json({
+        error: "Update failed",
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      error: "Profile update failed",
+      message: "Failed to update user profile",
+    });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  refreshToken,
+  logout,
+  verifyEmail,
+  requestPasswordReset,
+  resetPassword,
+  getProfile,
+  updateProfile,
 };

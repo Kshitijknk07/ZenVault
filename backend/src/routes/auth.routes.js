@@ -1,85 +1,96 @@
 const express = require("express");
-const { body, validationResult } = require("express-validator");
-const rateLimit = require("express-rate-limit");
-const auth = require("../controllers/auth.controller");
-const authenticateToken = require("../middlewares/auth.middleware");
+const { body } = require("express-validator");
+const authController = require("../controllers/auth.controller");
+const { verifyToken } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
-// Rate limiter: 5 requests per minute per IP for auth endpoints
-const authLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5,
-  message: "Too many attempts, please try again later.",
-});
+const validateRegistration = [
+  body("username")
+    .trim()
+    .isLength({ min: 3, max: 50 })
+    .withMessage("Username must be between 3 and 50 characters")
+    .matches(/^[a-zA-Z0-9_-]+$/)
+    .withMessage(
+      "Username can only contain letters, numbers, underscores, and hyphens"
+    ),
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Please provide a valid email address"),
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage(
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    ),
+];
 
+const validateLogin = [
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Please provide a valid email address"),
+  body("password").notEmpty().withMessage("Password is required"),
+];
+
+const validatePasswordReset = [
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Please provide a valid email address"),
+];
+
+const validateNewPassword = [
+  body("newPassword")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage(
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    ),
+];
+
+const validateProfileUpdate = [
+  body("username")
+    .optional()
+    .trim()
+    .isLength({ min: 3, max: 50 })
+    .withMessage("Username must be between 3 and 50 characters")
+    .matches(/^[a-zA-Z0-9_-]+$/)
+    .withMessage(
+      "Username can only contain letters, numbers, underscores, and hyphens"
+    ),
+  body("email")
+    .optional()
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Please provide a valid email address"),
+];
+
+router.post("/register", validateRegistration, authController.register);
+router.post("/login", validateLogin, authController.login);
+router.post("/refresh-token", authController.refreshToken);
+router.post("/logout", authController.logout);
+router.get("/verify/:token", authController.verifyEmail);
 router.post(
-  "/register",
-  authLimiter,
-  [
-    body("email").isEmail().withMessage("Invalid email address"),
-    body("password")
-      .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters")
-      .matches(/[A-Z]/)
-      .withMessage("Password must contain an uppercase letter")
-      .matches(/[a-z]/)
-      .withMessage("Password must contain a lowercase letter")
-      .matches(/[0-9]/)
-      .withMessage("Password must contain a number")
-      .matches(/[^A-Za-z0-9]/)
-      .withMessage("Password must contain a special character"),
-    body("username").notEmpty().withMessage("Username is required"),
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-  auth.register
+  "/forgot-password",
+  validatePasswordReset,
+  authController.requestPasswordReset
+);
+router.post(
+  "/reset-password",
+  validateNewPassword,
+  authController.resetPassword
 );
 
-router.post(
-  "/login",
-  authLimiter,
-  [
-    body("email").isEmail().withMessage("Invalid email address"),
-    body("password").notEmpty().withMessage("Password is required"),
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-  auth.login
+router.get("/profile", verifyToken, authController.getProfile);
+router.put(
+  "/profile",
+  verifyToken,
+  validateProfileUpdate,
+  authController.updateProfile
 );
-
-// Registration
-router.post("/register", auth.register);
-
-// Login
-router.post("/login", auth.login);
-
-// Protected profile route
-router.get("/profile", authenticateToken, auth.profile);
-
-// Forgot password
-router.post("/forgot-password", authLimiter, auth.forgotPassword);
-
-// Reset password
-router.post("/reset-password/:token", authLimiter, auth.resetPassword);
-
-// Email verification
-router.get("/verify-email", auth.verifyEmail);
-
-// Logout
-router.post("/logout", authenticateToken, auth.logout);
-
-// Refresh token
-router.post("/refresh-token", auth.refreshToken);
 
 module.exports = router;
