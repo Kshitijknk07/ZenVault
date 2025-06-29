@@ -10,9 +10,7 @@ import authRoutes from "@/routes/auth";
 import fileRoutes from "@/routes/files";
 import storageRoutes from "@/routes/storage";
 
-
 dotenv.config();
-console.log("JWT_SECRET:", process.env["JWT_SECRET"]);
 
 const app = express();
 const PORT = process.env["PORT"] || 3000;
@@ -93,24 +91,21 @@ app.use("*", (req, res) => {
   });
 });
 
-app.use((error: any, res: express.Response) => {
-  logger.error("Unhandled error:", error);
-
-  const statusCode = error.statusCode || 500;
-  const message = error.message || "Internal server error";
-
-  res.status(statusCode).json({
-    success: false,
-    message:
-      process.env["NODE_ENV"] === "production"
-        ? "Internal server error"
-        : message,
-    error:
-      process.env["NODE_ENV"] === "production"
-        ? "Something went wrong"
-        : error.stack,
-  });
-});
+app.use(
+  (
+    err: any,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction
+  ) => {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err?.message || err,
+    });
+  }
+);
 
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Rejection at:", promise, "reason:", reason);
