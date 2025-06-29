@@ -11,6 +11,7 @@ export interface User {
   lastLoginAt?: Date | undefined;
   createdAt: Date;
   updatedAt: Date;
+  storageQuota?: StorageQuota;
 }
 
 export enum UserRole {
@@ -86,6 +87,9 @@ export interface Folder {
   subFolders?: Folder[];
   files?: File[];
   owner?: User;
+  stats?: FolderStats;
+  path?: string;
+  depth?: number;
 }
 
 export interface File {
@@ -108,6 +112,8 @@ export interface File {
   versions?: FileVersion[];
   tags?: FileTag[];
   currentVersion?: FileVersion;
+  metadata?: FileMetadata[];
+  category?: FileCategory;
 }
 
 export interface FileVersion {
@@ -240,7 +246,80 @@ export interface FileStats {
   totalSize: number;
   totalFolders: number;
   filesByType: Record<string, number>;
+  filesByCategory: Record<FileCategory, number>;
   recentUploads: File[];
   storageUsed: number;
   storageLimit: number;
+  storageUsagePercentage: number;
+  quotaRemaining: number;
+}
+
+// Storage & Organization Types
+export interface StorageQuota {
+  id: string;
+  userId: string;
+  totalQuota: number; // in bytes
+  usedQuota: number; // in bytes
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum FileCategory {
+  DOCUMENT = "document",
+  IMAGE = "image",
+  VIDEO = "video",
+  AUDIO = "audio",
+  ARCHIVE = "archive",
+  OTHER = "other",
+}
+
+export interface FileTypeInfo {
+  category: FileCategory;
+  extensions: string[];
+  mimeTypes: string[];
+  maxSize: number; // in bytes
+  isPreviewable: boolean;
+}
+
+export interface FileMetadata {
+  id: string;
+  fileId: string;
+  key: string;
+  value: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface FolderStats {
+  id: string;
+  folderId: string;
+  totalFiles: number;
+  totalSize: number;
+  lastUpdated: Date;
+}
+
+export interface StorageQuotaRequest {
+  totalQuota: number;
+}
+
+export interface FileMetadataRequest {
+  key: string;
+  value: string;
+}
+
+export interface BulkFileOperationRequest {
+  fileIds: string[];
+  operation: "move" | "copy" | "delete" | "tag" | "untag";
+  destinationFolderId?: string;
+  tags?: string[];
+}
+
+export interface FolderTreeResponse {
+  id: string;
+  name: string;
+  path: string;
+  depth: number;
+  hasChildren: boolean;
+  fileCount: number;
+  totalSize: number;
 }

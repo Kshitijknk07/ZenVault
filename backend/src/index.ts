@@ -8,6 +8,7 @@ import DatabaseManager from "@/config/database";
 import logger from "@/config/logger";
 import authRoutes from "@/routes/auth";
 import fileRoutes from "@/routes/files";
+import storageRoutes from "@/routes/storage";
 
 dotenv.config();
 
@@ -80,6 +81,7 @@ app.get("/health", (_, res) => {
 
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
 app.use(`/api/${API_VERSION}/files`, fileRoutes);
+app.use(`/api/${API_VERSION}/storage`, storageRoutes);
 
 app.use("*", (req, res) => {
   res.status(404).json({

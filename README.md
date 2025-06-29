@@ -12,24 +12,30 @@ ZenVault is a robust file storage solution that offers secure authentication, ad
 - Secure user registration and login with JWT tokens
 - Role-based access control (User, Moderator, Admin)
 - Password reset and email verification capabilities
-- Session management with Redis
-- Advanced security with Helmet.js, CORS, and rate limiting
+- Session management with refresh tokens
 
 ### File Management
-- **Upload & Download**: Secure file handling with size validation and type checking
-- **Organization**: Hierarchical folder structure with unlimited nesting
-- **Versioning**: Automatic file versioning with rollback capabilities
-- **Metadata**: Rich file metadata including descriptions, tags, and custom properties
-- **Search**: Advanced search with filters for type, size, date, and tags
-- **Statistics**: Comprehensive storage analytics and usage tracking
-- **Access Control**: Granular permissions and public/private file settings
+- File upload, download, and versioning
+- File sharing with customizable permissions
+- File tagging and categorization
+- Soft delete with recovery options
+- File access logging and audit trails
 
-### Advanced Capabilities
-- **File Operations**: Move, copy, rename, and organize files efficiently
-- **Bulk Operations**: Support for multiple file operations
-- **Storage Management**: Soft delete, permanent delete, and storage optimization
-- **API Integration**: RESTful API for seamless integration with other systems
-- **Scalable Architecture**: Built for performance and scalability
+### Storage & Organization
+- **Hierarchical folder structure** with unlimited nesting levels
+- **Storage quota management** with per-user limits and usage tracking
+- **File metadata management** for custom properties and search
+- **File type support** for documents, images, videos, audio, archives, and more
+- **Bulk file operations** for move, copy, delete, and tagging
+- **Folder statistics** with file counts and size tracking
+- **Storage analytics** with usage breakdowns and trends
+
+### Advanced Features
+- Real-time file synchronization
+- Advanced search with filters and metadata
+- File preview capabilities for supported formats
+- Automated backup and recovery
+- API rate limiting and security
 
 ## Tech Stack
 
@@ -245,6 +251,71 @@ Content-Type: application/json
 GET /files/folders?query=documents&isPublic=false&page=1&limit=10
 Authorization: Bearer your-access-token
 ```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `POST /api/v1/auth/logout` - User logout
+- `POST /api/v1/auth/forgot-password` - Request password reset
+- `POST /api/v1/auth/reset-password` - Reset password
+
+### File Management
+- `POST /api/v1/files/upload` - Upload file
+- `GET /api/v1/files/:fileId/download` - Download file
+- `GET /api/v1/files/:fileId` - Get file details
+- `PUT /api/v1/files/:fileId` - Update file
+- `DELETE /api/v1/files/:fileId` - Delete file
+- `GET /api/v1/files/:fileId/versions` - Get file versions
+- `GET /api/v1/files/search` - Search files
+- `POST /api/v1/files/:fileId/share` - Share file
+- `GET /api/v1/files/shared` - Get shared files
+
+### Folder Management
+- `POST /api/v1/files/folders` - Create folder
+- `GET /api/v1/files/folders/:folderId` - Get folder details
+- `PUT /api/v1/files/folders/:folderId` - Update folder
+- `DELETE /api/v1/files/folders/:folderId` - Delete folder
+- `GET /api/v1/files/folders/:folderId/contents` - Get folder contents
+- `POST /api/v1/files/folders/:folderId/move` - Move folder
+- `POST /api/v1/files/folders/:folderId/copy` - Copy folder
+
+### Storage & Organization
+- `GET /api/v1/storage/quota` - Get user storage quota
+- `PUT /api/v1/storage/quota` - Update user storage quota
+- `GET /api/v1/storage/usage` - Get storage usage statistics
+- `GET /api/v1/storage/file-types` - Get supported file types
+- `POST /api/v1/storage/files/:fileId/metadata` - Add file metadata
+- `GET /api/v1/storage/files/:fileId/metadata` - Get file metadata
+- `PUT /api/v1/storage/files/:fileId/metadata/:key` - Update file metadata
+- `DELETE /api/v1/storage/files/:fileId/metadata/:key` - Delete file metadata
+- `GET /api/v1/storage/folders/tree` - Get folder tree structure
+- `GET /api/v1/storage/folders/hierarchy` - Get complete folder hierarchy
+- `GET /api/v1/storage/folders/:folderId/breadcrumb` - Get folder breadcrumb
+- `GET /api/v1/storage/folders/:folderId/stats` - Get folder statistics
+- `POST /api/v1/storage/files/bulk` - Perform bulk file operations
+- `GET /api/v1/storage/analytics` - Get storage analytics
+
+## Database Schema
+
+The system uses PostgreSQL with the following key tables:
+
+### Core Tables
+- `users` - User accounts and authentication
+- `folders` - Hierarchical folder structure
+- `files` - File metadata and storage information
+- `file_versions` - File versioning system
+- `file_shares` - File and folder sharing
+- `file_tags` - File tagging system
+- `file_access_logs` - Access tracking and audit
+
+### Storage & Organization Tables
+- `storage_quotas` - User storage limits and usage
+- `file_metadata` - Custom file metadata
+- `folder_stats` - Folder statistics and analytics
+- `file_categories` - File type categorization
 
 ## Development
 

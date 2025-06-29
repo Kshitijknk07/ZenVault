@@ -57,9 +57,6 @@ export class FolderModel {
     if (includeRelations) {
       // Load subfolders
       folder.subFolders = await this.findByParentId(id);
-
-      // Load files (you'll need to implement FileModel first)
-      // folder.files = await FileModel.findByFolderId(id);
     }
 
     return folder;
@@ -304,40 +301,165 @@ export class FolderModel {
     return path;
   }
 
-  static async checkAccess(
+  static async getFolderTree(
+    userId: string,
+    parentFolderId?: string
+  ): Promise<any[]> {
+    const query = `
+      SELECT * FROM get_folder_tree($1, $2)
+    `;
+
+    const result = await postgresPool.query(query, [
+      userId,
+      parentFolderId || null,
+    ]);
+    return result.rows;
+  }
+
+  static async getFolderWithStats(folderId: string): Promise<Folder | null> {
+    const query = `
+      SELECT f.*, 
+             u.id as owner_id, u.email as owner_email, u.username as owner_username,
+             u.first_name as owner_first_name, u.last_name as owner_last_name,
+             fs.total_files, fs.total_size, fs.last_updated
+      FROM folders f
+      LEFT JOIN users u ON f.owner_id = u.id
+      LEFT JOIN folder_stats fs ON f.id = fs.folder_id
+      WHERE f.id = $1
+    `;
+
+    const result = await postgresPool.query(query, [folderId]);
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const folder = this.mapToFolderWithStats(result.rows[0]);
+
+    // Load folder path
+    const path = await this.getFolderPath(folderId);
+    folder.path = path.map((f) => f.name).join("/");
+    folder.depth = path.length - 1;
+
+    return folder;
+  }
+
+  static async getFolderHierarchy(userId: string): Promise<Folder[]> {
+    const query = `
+      WITH RECURSIVE folder_hierarchy AS (
+        -- Base case: root folders
+        SELECT 
+          f.id, f.name, f.description, f.parent_folder_id, f.owner_id, f.is_public,
+          f.created_at, f.updated_at,
+          0 as depth,
+          f.name as path
+        FROM folders f
+        WHERE f.owner_id = $1 AND f.parent_folder_id IS NULL
+        
+        UNION ALL
+        
+        -- Recursive case: child folders
+        SELECT 
+          f.id, f.name, f.description, f.parent_folder_id, f.owner_id, f.is_public,
+          f.created_at, f.updated_at,
+          fh.depth + 1,
+          fh.path || '/' || f.name
+        FROM folders f
+        INNER JOIN folder_hierarchy fh ON f.parent_folder_id = fh.id
+        WHERE f.owner_id = $1
+      )
+      SELECT 
+        fh.*,
+        u.id as owner_id, u.email as owner_email, u.username as owner_username,
+        u.first_name as owner_first_name, u.last_name as owner_last_name,
+        fs.total_files, fs.total_size, fs.last_updated
+      FROM folder_hierarchy fh
+      LEFT JOIN users u ON fh.owner_id = u.id
+      LEFT JOIN folder_stats fs ON fh.id = fs.folder_id
+      ORDER BY fh.path
+    `;
+
+    const result = await postgresPool.query(query, [userId]);
+    return result.rows.map((row: any) => this.mapToFolderWithStats(row));
+  }
+
+  static async getFolderBreadcrumb(folderId: string): Promise<Folder[]> {
+    const query = `
+      SELECT * FROM get_folder_path($1)
+    `;
+
+    const result = await postgresPool.query(query, [folderId]);
+    const folderIds = result.rows.map((row: any) => row.id);
+
+    if (folderIds.length === 0) {
+      return [];
+    }
+
+    // Get full folder details for each folder in the path
+    const folders: Folder[] = [];
+    for (const id of folderIds) {
+      const folder = await this.findById(id);
+      if (folder) {
+        folders.push(folder);
+      }
+    }
+
+    return folders;
+  }
+
+  static async getFolderSize(folderId: string): Promise<number> {
+    const query = `
+      SELECT COALESCE(SUM(f.size), 0) as total_size
+      FROM files f
+      WHERE f.folder_id = $1 AND f.is_deleted = false
+    `;
+
+    const result = await postgresPool.query(query, [folderId]);
+    return parseInt(result.rows[0].total_size) || 0;
+  }
+
+  static async getFolderFileCount(folderId: string): Promise<number> {
+    const query = `
+      SELECT COUNT(*) as file_count
+      FROM files f
+      WHERE f.folder_id = $1 AND f.is_deleted = false
+    `;
+
+    const result = await postgresPool.query(query, [folderId]);
+    return parseInt(result.rows[0].file_count) || 0;
+  }
+
+  static async moveFolder(
     folderId: string,
-    userId: string
-  ): Promise<{
-    canRead: boolean;
-    canWrite: boolean;
-    canAdmin: boolean;
-  }> {
-    const folder = await this.findById(folderId);
-    if (!folder) {
-      return { canRead: false, canWrite: false, canAdmin: false };
+    newParentFolderId: string | null
+  ): Promise<Folder | null> {
+    // Check for circular reference
+    if (newParentFolderId) {
+      const isCircular = await this.checkCircularReference(
+        folderId,
+        newParentFolderId
+      );
+      if (isCircular) {
+        throw new Error("Cannot move folder: would create circular reference");
+      }
     }
 
-    // Owner has full access
-    if (folder.ownerId === userId) {
-      return { canRead: true, canWrite: true, canAdmin: true };
+    const updateData: any = {};
+    if (newParentFolderId !== null) {
+      updateData.parentFolderId = newParentFolderId;
     }
 
-    // Public folders are readable
-    if (folder.isPublic) {
-      return { canRead: true, canWrite: false, canAdmin: false };
-    }
+    const updatedFolder = await this.updateWithParent(folderId, updateData);
 
-    // Check shared access (you'll need to implement FileShareModel)
-    // const share = await FileShareModel.findByResource('folder', folderId, userId);
-    // if (share) {
-    //   return {
-    //     canRead: true,
-    //     canWrite: share.permission === 'write' || share.permission === 'admin',
-    //     canAdmin: share.permission === 'admin'
-    //   };
-    // }
+    return updatedFolder;
+  }
 
-    return { canRead: false, canWrite: false, canAdmin: false };
+  private static async checkCircularReference(
+    folderId: string,
+    newParentId: string
+  ): Promise<boolean> {
+    const path = await this.getFolderPath(newParentId);
+    return path.some((folder) => folder.id === folderId);
   }
 
   private static mapToFolder(row: any): Folder {
@@ -373,5 +495,74 @@ export class FolderModel {
     }
 
     return folder;
+  }
+
+  private static mapToFolderWithStats(row: any): Folder {
+    const folder: any = {
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      parentFolderId: row.parent_folder_id,
+      ownerId: row.owner_id,
+      isPublic: row.is_public,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      depth: row.depth,
+      path: row.path,
+    };
+
+    if (row.owner_id) {
+      folder.owner = {
+        id: row.owner_id,
+        email: row.owner_email,
+        username: row.owner_username,
+        firstName: row.owner_first_name,
+        lastName: row.owner_last_name,
+        password: "",
+        role: "user" as any,
+        isEmailVerified: false,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    }
+
+    if (row.total_files !== null) {
+      folder.stats = {
+        id: row.id,
+        folderId: row.id,
+        totalFiles: parseInt(row.total_files),
+        totalSize: parseInt(row.total_size),
+        lastUpdated: row.last_updated,
+      };
+    }
+
+    return folder;
+  }
+
+  static async checkAccess(
+    folderId: string,
+    userId: string
+  ): Promise<{
+    canRead: boolean;
+    canWrite: boolean;
+    canAdmin: boolean;
+  }> {
+    const folder = await this.findById(folderId);
+    if (!folder) {
+      return { canRead: false, canWrite: false, canAdmin: false };
+    }
+
+    // Owner has full access
+    if (folder.ownerId === userId) {
+      return { canRead: true, canWrite: true, canAdmin: true };
+    }
+
+    // Public folders are readable
+    if (folder.isPublic) {
+      return { canRead: true, canWrite: false, canAdmin: false };
+    }
+
+    return { canRead: false, canWrite: false, canAdmin: false };
   }
 }

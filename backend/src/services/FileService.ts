@@ -2,11 +2,11 @@ import { FileModel } from "../models/File";
 import { FolderModel } from "../models/Folder";
 import {
   File,
-  Folder,
   FileVersion,
   FileUploadResponse,
   FileDownloadResponse,
   FileStats,
+  FileCategory,
 } from "../types";
 import * as fs from "fs";
 import * as path from "path";
@@ -30,10 +30,10 @@ export class FileService {
   // Configure multer for file uploads
   static getMulterConfig() {
     return multer.diskStorage({
-      destination: (req, file, cb) => {
+      destination: (_req, _file, cb) => {
         cb(null, this.uploadDir);
       },
-      filename: (req, file, cb) => {
+      filename: (_req, file, cb) => {
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
         const ext = path.extname(file.originalname);
         cb(null, `${uniqueSuffix}${ext}`);
@@ -79,10 +79,9 @@ export class FileService {
       fs.renameSync(file.path, filePath);
 
       // Create file record
-      const fileData = {
+      const fileData: any = {
         name: path.parse(file.originalname).name,
         originalName: file.originalname,
-        description: options.description,
         mimeType: file.mimetype,
         size: file.size,
         filePath,
@@ -90,6 +89,8 @@ export class FileService {
         ownerId: userId,
         isPublic: options.isPublic || false,
       };
+      if (options.description !== undefined)
+        fileData.description = options.description;
 
       const createdFile = await FileModel.create(fileData);
 
@@ -323,8 +324,10 @@ export class FileService {
     // Count files by type
     const filesByType: Record<string, number> = {};
     userFiles.forEach((file: File) => {
-      const type = file.mimeType.split("/")[0];
-      filesByType[type] = (filesByType[type] || 0) + 1;
+      const type = file.mimeType?.split("/")[0];
+      if (type) {
+        filesByType[type] = (filesByType[type] || 0) + 1;
+      }
     });
 
     // Get recent uploads (last 10)
@@ -341,14 +344,73 @@ export class FileService {
       process.env["STORAGE_LIMIT"] || "10737418240"
     ); // 10GB default
 
+    const storageUsed = totalSize;
+
+    // In getFileStats:
+    const filesByCategory: Record<FileCategory, number> = {
+      [FileCategory.DOCUMENT]: 0,
+      [FileCategory.IMAGE]: 0,
+      [FileCategory.VIDEO]: 0,
+      [FileCategory.AUDIO]: 0,
+      [FileCategory.ARCHIVE]: 0,
+      [FileCategory.OTHER]: 0,
+    };
+    userFiles.forEach((file: File) => {
+      let category = file.category;
+      if (!category) {
+        // Infer from mimeType
+        const type = file.mimeType?.split("/")[0];
+        switch (type) {
+          case "image":
+            category = FileCategory.IMAGE;
+            break;
+          case "video":
+            category = FileCategory.VIDEO;
+            break;
+          case "audio":
+            category = FileCategory.AUDIO;
+            break;
+          case "application":
+            if (
+              file.mimeType.includes("pdf") ||
+              file.mimeType.includes("msword") ||
+              file.mimeType.includes("officedocument")
+            ) {
+              category = FileCategory.DOCUMENT;
+            } else if (
+              file.mimeType.includes("zip") ||
+              file.mimeType.includes("rar") ||
+              file.mimeType.includes("tar") ||
+              file.mimeType.includes("gzip") ||
+              file.mimeType.includes("bzip2")
+            ) {
+              category = FileCategory.ARCHIVE;
+            } else {
+              category = FileCategory.OTHER;
+            }
+            break;
+          case "text":
+            category = FileCategory.DOCUMENT;
+            break;
+          default:
+            category = FileCategory.OTHER;
+        }
+      }
+      filesByCategory[category] = (filesByCategory[category] || 0) + 1;
+    });
+
     return {
       totalFiles,
       totalSize,
       totalFolders,
       filesByType,
+      filesByCategory,
       recentUploads,
-      storageUsed: totalSize,
+      storageUsed,
       storageLimit,
+      storageUsagePercentage:
+        storageLimit > 0 ? (storageUsed / storageLimit) * 100 : 0,
+      quotaRemaining: storageLimit - storageUsed,
     };
   }
 
