@@ -10,7 +10,9 @@ import authRoutes from "@/routes/auth";
 import fileRoutes from "@/routes/files";
 import storageRoutes from "@/routes/storage";
 
+
 dotenv.config();
+console.log("JWT_SECRET:", process.env["JWT_SECRET"]);
 
 const app = express();
 const PORT = process.env["PORT"] || 3000;
